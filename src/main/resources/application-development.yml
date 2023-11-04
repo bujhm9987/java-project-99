@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: "jdbc:h2:mem:java-project-99"
+    username: sa
+    password: 123
+  h2:
+    console:
+      enabled: true
+      path: /h2console/
+    settings:
+      web-allow-others: true
