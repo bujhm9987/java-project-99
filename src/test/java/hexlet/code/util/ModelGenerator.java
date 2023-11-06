@@ -27,4 +27,5 @@ public class ModelGenerator {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .toModel();
     }
+
 }
