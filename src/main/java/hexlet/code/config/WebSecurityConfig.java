@@ -27,8 +27,8 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((request) -> request
                         .requestMatchers(antMatcher("/h2console/")).permitAll()
-                        .requestMatchers(antMatcher(POST, "/api/users")).permitAll()
-                        .requestMatchers(antMatcher(GET, "/api/users")).permitAll()
+                        .requestMatchers(antMatcher("/api/users")).permitAll()
+                        .requestMatchers(antMatcher("/api/users/{id}")).permitAll()
                 );
         return http.build();
     }

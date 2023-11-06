@@ -10,11 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserCreateDTO {
-    @NotBlank(message = "FirstName must not be blank")
     private String firstName;
-    @NotBlank(message = "LastName must not be blank")
     private String lastName;
-    @NotBlank
     @Email
     private String email;
     @NotNull(message = "Password must be longer than 3 characters")
