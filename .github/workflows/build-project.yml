@@ -8,17 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup JDK 20
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '20'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
-          build-root-directory: app
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         if: ${{ github.event_name == 'push' }}
