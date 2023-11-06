@@ -13,13 +13,12 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class ModelGenerator {
-    private Model<User> userModel;
 
-    @Autowired
-    private Faker faker;
+    private Model<User> userModel;
 
     @PostConstruct
     private void init() {
+        var faker = new Faker();
         userModel = Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
