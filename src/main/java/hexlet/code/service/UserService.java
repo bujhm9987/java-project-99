@@ -47,8 +47,8 @@ public class UserService {
     public UserDTO update(UserUpdateDTO userData, Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id \" + id + \" not found"));
-        user.setPassword(encoder.encode(user.getPassword()));
         userMapper.update(userData, user);
+        user.setPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
         return userMapper.map(user);
     }
