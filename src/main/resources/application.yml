@@ -10,3 +10,6 @@ spring:
       enabled: always
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:development}
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem

@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +49,8 @@ class UserControllerTest {
     @Autowired
     private Faker faker;
 
+    private JwtRequestPostProcessor token;
+
     private User testUser;
 
     @Value("${base-url}")
@@ -55,6 +59,7 @@ class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
+        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
@@ -62,7 +67,7 @@ class UserControllerTest {
     public void testIndex() throws Exception {
         userRepository.save(testUser);
 
-        var result = mockMvc.perform(get(baseUrl + "/users"))
+        var result = mockMvc.perform(get(baseUrl + "/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -76,7 +81,7 @@ class UserControllerTest {
         userRepository.save(testUser);
 
         var request = get(baseUrl + "/users/{id}", testUser.getId());
-        var result = mockMvc.perform(request)
+        var result = mockMvc.perform(request.with(token))
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
@@ -99,7 +104,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isCreated());
 
         var user = userRepository.findByEmail(
@@ -121,20 +126,20 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testCreateWithNotValidPassword() throws Exception {
+        testUser.setPassword("pa");
         var dto = mapper.mapToCreateDTO(testUser);
-        dto.setPassword("pa");
 
         var request = post(baseUrl + "/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isBadRequest());
     }
 
@@ -153,7 +158,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isOk());
 
         var user = userRepository.findById(
@@ -180,7 +185,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isOk());
 
         var user = userRepository.findById(
@@ -194,7 +199,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testWithNotValidEmail() throws Exception {
+    public void testUpdateWithNotValidEmail() throws Exception {
 
         userRepository.save(testUser);
 
@@ -206,12 +211,12 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void testWithNotValidPassword() throws Exception {
+    public void testUpdateWithNotValidPassword() throws Exception {
 
         userRepository.save(testUser);
 
@@ -223,14 +228,14 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isBadRequest());
     }
 
     public void testDestroy() throws Exception {
         userRepository.save(testUser);
         var request = delete(baseUrl + "/users/{id}", testUser.getId());
-        mockMvc.perform(request)
+        mockMvc.perform(request.with(token))
                 .andExpect(status().isOk());
 
         assertThat(userRepository.existsById(testUser.getId())).isEqualTo(false);
