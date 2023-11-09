@@ -1,5 +1,10 @@
 setup:
+	npm install
 	./gradlew wrapper --gradle-version 8.4
+	./gradlew build
+
+frontend:
+	make -C frontend start
 
 clean:
 	./gradlew clean
@@ -37,4 +42,4 @@ generate-migrations:
 db-migrate:
 	./gradlew update
 
-.PHONY: build
+.PHONY: build frontend

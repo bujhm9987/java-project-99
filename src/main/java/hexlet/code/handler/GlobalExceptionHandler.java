@@ -1,5 +1,6 @@
 package hexlet.code.handler;
 
+import hexlet.code.exception.AccessUserDeniedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,4 +20,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AccessUserDeniedException.class)
+    public ResponseEntity<String> handleAccessUserDeniedException(AccessUserDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
 }

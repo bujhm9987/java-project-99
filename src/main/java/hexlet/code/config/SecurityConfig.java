@@ -2,6 +2,7 @@ package hexlet.code.config;
 
 import hexlet.code.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,10 @@ public class SecurityConfig {
     @Autowired
     private JwtDecoder jwtDecoder;
 
+    @Value("${base-url}")
+    @Autowired
+    private String baseUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
             throws Exception {
@@ -44,10 +49,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/welcome")).permitAll()
-                        .requestMatchers(mvcMatcherBuilder.pattern("/api/login")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern(baseUrl + "/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/h2console/")).permitAll()
-                        .requestMatchers(mvcMatcherBuilder.pattern(POST, "/api/users")).permitAll()
-                        .requestMatchers(mvcMatcherBuilder.pattern(GET, "/api/users")).authenticated()
+                        .requestMatchers(mvcMatcherBuilder.pattern(POST, baseUrl + "/users")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern(GET, baseUrl + "/users")).authenticated()
+
+                        .requestMatchers(mvcMatcherBuilder.pattern("/index.html")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/assets/**")).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

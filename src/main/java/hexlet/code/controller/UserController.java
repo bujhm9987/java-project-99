@@ -3,13 +3,13 @@ package hexlet.code.controller;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.exception.AccessUserDeniedException;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +35,9 @@ public class UserController {
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<UserDTO>> getUsers() {
+        var users = userService.getAll();
         return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(users.size()))
                 .body(userService.getAll());
     }
 
@@ -56,7 +58,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody @Valid UserUpdateDTO userData) {
         if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessDeniedException("You do not have enough privileges to delete this user");
+            throw new AccessUserDeniedException("You do not have enough privileges to update this user");
         }
         return ResponseEntity.ok()
                 .body(userService.update(userData, id));
@@ -66,9 +68,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
         if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessDeniedException("You do not have enough privileges to delete this user");
+            throw new AccessUserDeniedException("You do not have enough privileges to delete this user");
         }
         userService.delete(id);
     }
-
 }
