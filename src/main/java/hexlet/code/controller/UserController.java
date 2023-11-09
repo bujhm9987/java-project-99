@@ -4,10 +4,12 @@ import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.service.UserService;
+import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +27,9 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserUtils userUtils;
 
 
     @GetMapping(path = "")
@@ -50,6 +55,9 @@ public class UserController {
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody @Valid UserUpdateDTO userData) {
+        if (userUtils.getCurrentUser().getId() != id) {
+            throw new AccessDeniedException("You do not have enough privileges to delete this user");
+        }
         return ResponseEntity.ok()
                 .body(userService.update(userData, id));
     }
@@ -57,6 +65,9 @@ public class UserController {
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
+        if (userUtils.getCurrentUser().getId() != id) {
+            throw new AccessDeniedException("You do not have enough privileges to delete this user");
+        }
         userService.delete(id);
     }
 
