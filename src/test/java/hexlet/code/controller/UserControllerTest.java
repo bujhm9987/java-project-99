@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
@@ -49,9 +49,9 @@ class UserControllerTest {
     @Autowired
     private Faker faker;
 
-    private JwtRequestPostProcessor token;
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-    private JwtRequestPostProcessor tokenDefaultUser;
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenDefaultUser;
 
     private User testUser;
 
@@ -141,8 +141,8 @@ class UserControllerTest {
 
     @Test
     public void testCreateWithNotValidEmail() throws Exception {
+        testUser.setEmail("email");
         var dto = mapper.mapToCreateDTO(testUser);
-        dto.setEmail("email");
 
         var request = post(baseUrl + "/users")
                 .contentType(MediaType.APPLICATION_JSON)

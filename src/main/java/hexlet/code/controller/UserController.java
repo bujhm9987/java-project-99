@@ -31,14 +31,13 @@ public class UserController {
     @Autowired
     private UserUtils userUtils;
 
-
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<UserDTO>> getUsers() {
         var users = userService.getAll();
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(users.size()))
-                .body(userService.getAll());
+                .body(users);
     }
 
     @PostMapping(path = "")
