@@ -36,6 +36,7 @@ public class DataInitializer implements ApplicationRunner {
         generatedTaskStatus("ToBeFixed", "to_be_fixed");
         generatedTaskStatus("ToPublish", "to_publish");
         generatedTaskStatus("Published", "published");
+
     }
 
     private void generatedTaskStatus(String name, String slug) {
