@@ -16,7 +16,7 @@ public class TaskUpdateDTO {
     @JsonProperty("assignee_id")
     private JsonNullable<Long> assigneeId;
 
-    // ?? @NotNull
+    @NotNull
     @Size(min = 1)
     @JsonProperty("title")
     private JsonNullable<String> name;
@@ -24,6 +24,6 @@ public class TaskUpdateDTO {
     @JsonProperty("content")
     private JsonNullable<String> description;
 
-    // ?? @NotNull
+    @NotNull
     private JsonNullable<String> status;
 }

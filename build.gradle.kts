@@ -37,8 +37,9 @@ dependencies {
 
 	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation(platform("org.junit:junit-bom:5.10.0"))
-	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+	testImplementation(platform("org.junit:junit-bom:5.9.2"))
+	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 
 }

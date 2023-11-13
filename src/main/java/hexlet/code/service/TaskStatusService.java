@@ -3,6 +3,7 @@ package hexlet.code.service;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
+import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
@@ -34,19 +35,26 @@ public class TaskStatusService {
 
     public TaskStatusDTO findById(Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with id \" + id + \" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
         return taskStatusMapper.map(taskStatus);
     }
 
     public TaskStatusDTO update(TaskStatusUpdateDTO taskStatusData, Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with id \" + id + \" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
         taskStatusMapper.update(taskStatusData, taskStatus);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
     }
 
     public void delete(Long id) {
-        taskStatusRepository.deleteById(id);
+        var taskStatus = taskStatusRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
+        var tasks = taskStatus.getTasks();
+        if (tasks.isEmpty()) {
+            taskStatusRepository.deleteById(id);
+        } else {
+            throw new ConstraintViolationException(String.format("TaskStatus with id %s is used in tasks", id));
+        }
     }
 }

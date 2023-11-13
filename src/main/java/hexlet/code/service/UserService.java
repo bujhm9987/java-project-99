@@ -3,6 +3,7 @@ package hexlet.code.service;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
@@ -40,13 +41,13 @@ public class UserService {
 
     public UserDTO findById(Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id \" + id + \" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
         return userMapper.map(user);
     }
 
     public UserDTO update(UserUpdateDTO userData, Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id \" + id + \" not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
         userMapper.update(userData, user);
         user.setPassword(encoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -54,6 +55,13 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        userRepository.deleteById(id);
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
+        var userTasks = user.getTasks();
+        if (userTasks.isEmpty()) {
+            userRepository.deleteById(id);
+        } else {
+            throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
+        }
     }
 }

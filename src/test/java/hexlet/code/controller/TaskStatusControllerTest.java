@@ -53,7 +53,6 @@ class TaskStatusControllerTest {
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-
     private User testUser;
 
     private TaskStatus testTaskStatus;

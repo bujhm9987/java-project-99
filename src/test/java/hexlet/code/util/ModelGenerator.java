@@ -1,5 +1,6 @@
 package hexlet.code.util;
 
+import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +20,8 @@ public class ModelGenerator {
 
     private Model<TaskStatus> taskStatusModel;
 
+    private Model<Task> taskModel;
+
     @Autowired
     private Faker faker;
 
@@ -37,5 +40,7 @@ public class ModelGenerator {
                 .supply(Select.field(TaskStatus::getName), () -> faker.name().name())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
                 .toModel();
+
+
     }
 }
