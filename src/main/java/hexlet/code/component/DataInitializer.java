@@ -1,7 +1,9 @@
 package hexlet.code.component;
 
+import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,9 @@ public class DataInitializer implements ApplicationRunner {
     private final TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private final LabelRepository labelRepository;
+
+    @Autowired
     private PasswordEncoder encoder;
 
     @Override
@@ -37,6 +42,8 @@ public class DataInitializer implements ApplicationRunner {
         generatedTaskStatus("ToPublish", "to_publish");
         generatedTaskStatus("Published", "published");
 
+        generatedLabel("bug");
+        generatedLabel("feature");
     }
 
     private void generatedTaskStatus(String name, String slug) {
@@ -44,5 +51,11 @@ public class DataInitializer implements ApplicationRunner {
         taskStatus.setName(name);
         taskStatus.setSlug(slug);
         taskStatusRepository.save(taskStatus);
+    }
+
+    private void generatedLabel(String name) {
+        var label = new Label();
+        label.setName(name);
+        labelRepository.save(label);
     }
 }

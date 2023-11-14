@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -66,9 +67,9 @@ public class TaskControllerTest {
 
     private Task testTask;
 
-    @Value("${base-url}")
+    @Value("${base-url}" + "/tasks")
     @Autowired
-    private String baseUrl;
+    private String url;
 
     @BeforeEach
     public void setUp() {
@@ -95,7 +96,7 @@ public class TaskControllerTest {
     public void testIndex() throws Exception {
         taskRepository.save(testTask);
 
-        var result = mockMvc.perform(get(baseUrl + "/tasks").with(token))
+        var result = mockMvc.perform(get(url).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -107,7 +108,7 @@ public class TaskControllerTest {
     public void testIndexWithoutAuthentication() throws Exception {
         taskRepository.save(testTask);
 
-        var result = mockMvc.perform(get(baseUrl + "/tasks"))
+        mockMvc.perform(get(url))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
     }
@@ -116,18 +117,19 @@ public class TaskControllerTest {
     public void testShow() throws Exception {
         taskRepository.save(testTask);
 
-        var request = get(baseUrl + "/tasks/{id}", testTask.getId()).with(token);
+        var request = get(url + "/{id}", testTask.getId()).with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-
+        var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         assertThatJson(body).and(
                 v -> v.node("index").isEqualTo(testTask.getIndex()),
                 v -> v.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
-                v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug())
+                v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
+                v -> v.node("createdAt").isEqualTo(dateFormatter.format(testTask.getCreatedAt()))
         );
     }
 
@@ -135,8 +137,8 @@ public class TaskControllerTest {
     public void testShowWithoutAuthentication() throws Exception {
         taskRepository.save(testTask);
 
-        var request = get(baseUrl + "/tasks/{id}", testTask.getId());
-        var result = mockMvc.perform(request)
+        var request = get(url + "/{id}", testTask.getId());
+        mockMvc.perform(request)
                 .andExpect(status().isUnauthorized())
                 .andReturn();
     }
@@ -146,7 +148,7 @@ public class TaskControllerTest {
         testTask.setName("Unique testName");
         var dto = mapper.mapToCreateDTO(testTask);
 
-        var request = post(baseUrl + "/tasks").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -168,7 +170,7 @@ public class TaskControllerTest {
     public void testCreateWithoutAuthentication() throws Exception {
         var dto = mapper.mapToCreateDTO(testTask);
 
-        var request = post(baseUrl + "/tasks")
+        var request = post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -186,7 +188,7 @@ public class TaskControllerTest {
         testTask.setName("");
         var dto = mapper.mapToCreateDTO(testTask);
 
-        var request = post(baseUrl + "/tasks").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -199,7 +201,7 @@ public class TaskControllerTest {
         testTask.setTaskStatus(null);
         var dto = mapper.mapToCreateDTO(testTask);
 
-        var request = post(baseUrl + "/tasks").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -220,7 +222,7 @@ public class TaskControllerTest {
         );
 
 
-        var request = put(baseUrl + "/tasks/{id}", testTask.getId()).with(token)
+        var request = put(url + "/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -248,7 +250,7 @@ public class TaskControllerTest {
                 "content", faker.lorem().sentence()
         );
 
-        var request = put(baseUrl + "/tasks/{id}", testTask.getId())
+        var request = put(url + "/{id}", testTask.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -265,7 +267,7 @@ public class TaskControllerTest {
                 "status", taskStatusRepository.findBySlug("to_review").get().getSlug()
         );
 
-        var request = put(baseUrl + "/tasks/{id}", testTask.getId()).with(token)
+        var request = put(url + "/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -291,7 +293,7 @@ public class TaskControllerTest {
                 "title", ""
         );
 
-        var request = put(baseUrl + "/tasks/{id}", testTask.getId()).with(token)
+        var request = put(url + "/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -307,7 +309,7 @@ public class TaskControllerTest {
                 "status", "Any_status"
         );
 
-        var request = put(baseUrl + "/tasks/{id}", testTask.getId()).with(token)
+        var request = put(url + "/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -320,7 +322,7 @@ public class TaskControllerTest {
 
         taskRepository.save(testTask);
 
-        var request = delete(baseUrl + "/tasks/{id}", testTask.getId()).with(token);
+        var request = delete(url + "/{id}", testTask.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
 
@@ -335,7 +337,7 @@ public class TaskControllerTest {
 
         taskRepository.save(testTask);
 
-        var request = delete(baseUrl + "/tasks/{id}", testTask.getId());
+        var request = delete(url + "/{id}", testTask.getId());
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
 

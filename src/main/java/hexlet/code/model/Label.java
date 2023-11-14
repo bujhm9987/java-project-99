@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,32 +19,19 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Setter
 @Entity
-@Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-public class Task implements BaseEntity {
+@Table(name = "labels")
+public class Label implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private long id;
 
     @NotNull
-    @Size(min = 1)
+    @Size(min = 3, max = 1000)
     private String name;
-
-    private Integer index;
-
-    private String description;
-
-    @NotNull
-    @ManyToOne
-    private TaskStatus taskStatus;
-
-    @ManyToOne
-    private User assignee;
-
-    /*@ManyToMany
-    private List<Label> labels = new ArrayList<>();*/
 
     @CreatedDate
     private Date createdAt;
+
 }

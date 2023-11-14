@@ -2,12 +2,16 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -40,6 +45,12 @@ class TaskStatusControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ObjectMapper om;
 
     @Autowired
@@ -57,9 +68,9 @@ class TaskStatusControllerTest {
 
     private TaskStatus testTaskStatus;
 
-    @Value("${base-url}")
+    @Value("${base-url}" + "/task_statuses")
     @Autowired
-    private String baseUrl;
+    private String url;
 
     @BeforeEach
     public void setUp() {
@@ -73,7 +84,7 @@ class TaskStatusControllerTest {
 
         taskStatusRepository.save(testTaskStatus);
 
-        var result = mockMvc.perform(get(baseUrl + "/task_statuses").with(token))
+        var result = mockMvc.perform(get(url).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -86,16 +97,17 @@ class TaskStatusControllerTest {
 
         taskStatusRepository.save(testTaskStatus);
 
-        var request = get(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token);
+        var request = get(url + "/{id}", testTaskStatus.getId()).with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
+        var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
         assertThatJson(body).and(
                 v -> v.node("name").isEqualTo(testTaskStatus.getName()),
                 v -> v.node("slug").isEqualTo(testTaskStatus.getSlug()),
-                v -> v.node("createdAt").isEqualTo(testTaskStatus.getCreatedAt())
+                v -> v.node("createdAt").isEqualTo(dateFormatter.format(testTaskStatus.getCreatedAt()))
         );
     }
 
@@ -104,7 +116,7 @@ class TaskStatusControllerTest {
 
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
-        var request = post(baseUrl + "/task_statuses").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -124,7 +136,7 @@ class TaskStatusControllerTest {
 
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
-        var request = post(baseUrl + "/task_statuses")
+        var request = post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -137,7 +149,7 @@ class TaskStatusControllerTest {
         testTaskStatus.setName("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
-        var request = post(baseUrl + "/task_statuses").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -150,7 +162,7 @@ class TaskStatusControllerTest {
         testTaskStatus.setSlug("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
-        var request = post(baseUrl + "/task_statuses").with(token)
+        var request = post(url).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -167,7 +179,7 @@ class TaskStatusControllerTest {
                 "slug", faker.internet().slug()
         );
 
-        var request = put(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token)
+        var request = put(url + "/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -191,7 +203,7 @@ class TaskStatusControllerTest {
                 "slug", faker.internet().slug()
         );
 
-        var request = put(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token)
+        var request = put(url + "/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -215,7 +227,7 @@ class TaskStatusControllerTest {
                 "name", ""
         );
 
-        var request = put(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token)
+        var request = put(url + "/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -232,7 +244,7 @@ class TaskStatusControllerTest {
                 "slug", ""
         );
 
-        var request = put(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token)
+        var request = put(url + "/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -249,7 +261,7 @@ class TaskStatusControllerTest {
                 "slug", faker.internet().slug()
         );
 
-        var request = put(baseUrl + "/task_statuses/{id}", testTaskStatus.getId())
+        var request = put(url + "/{id}", testTaskStatus.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(newData));
 
@@ -262,7 +274,7 @@ class TaskStatusControllerTest {
 
         taskStatusRepository.save(testTaskStatus);
 
-        var request = delete(baseUrl + "/task_statuses/{id}", testTaskStatus.getId()).with(token);
+        var request = delete(url + "/{id}", testTaskStatus.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
 
@@ -277,9 +289,37 @@ class TaskStatusControllerTest {
 
         taskStatusRepository.save(testTaskStatus);
 
-        var request = delete(baseUrl + "/task_statuses/{id}", testTaskStatus.getId());
+        var request = delete(url + "/{id}", testTaskStatus.getId());
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
+
+        var taskStatus = taskStatusRepository.findById(
+                testTaskStatus.getId()).orElse(null);
+
+        assertThat(taskStatus).isNotNull();
+    }
+
+    @Test
+    public void testDestroyWithActiveTask() throws Exception {
+        taskStatusRepository.save(testTaskStatus);
+        userRepository.save(testUser);
+
+        var user = userRepository.findById(testUser.getId()).get();
+        var status = taskStatusRepository.findBySlug(testTaskStatus.getSlug()).get();
+
+        var testTask = Instancio.of(Task.class)
+                .ignore(Select.field(Task::getId))
+                .supply(Select.field(Task::getName), () -> faker.lorem().word())
+                .supply(Select.field(Task::getIndex), () -> faker.number().positive())
+                .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
+                .supply(Select.field(Task::getTaskStatus), () -> status)
+                .supply(Select.field(Task::getAssignee), () -> user)
+                .create();
+        taskRepository.save(testTask);
+
+        var request = delete(url + "/{id}", testTaskStatus.getId()).with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
 
         var taskStatus = taskStatusRepository.findById(
                 testTaskStatus.getId()).orElse(null);

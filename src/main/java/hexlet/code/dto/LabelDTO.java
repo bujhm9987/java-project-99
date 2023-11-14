@@ -8,12 +8,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class UserDTO {
+public class LabelDTO {
     private long id;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String name;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date createdAt;
-    private Date updatedAt;
 }

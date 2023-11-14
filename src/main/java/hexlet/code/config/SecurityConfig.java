@@ -54,7 +54,6 @@ public class SecurityConfig {
                         .requestMatchers(mvcMatcherBuilder.pattern(baseUrl + "/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/h2console/")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern(POST, baseUrl + "/users")).permitAll()
-                        //.requestMatchers(mvcMatcherBuilder.pattern(GET, baseUrl + "/users")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern(GET, baseUrl + "/task_statuses")).permitAll()
 
                         .anyRequest().authenticated())
