@@ -2,8 +2,10 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -22,6 +24,8 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -47,6 +51,9 @@ public class TaskControllerTest {
     private TaskRepository taskRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
@@ -67,6 +74,8 @@ public class TaskControllerTest {
 
     private Task testTask;
 
+    private List<Label> testLabelList = new ArrayList<>();
+
     @Value("${base-url}" + "/tasks")
     @Autowired
     private String url;
@@ -76,6 +85,10 @@ public class TaskControllerTest {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
         var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+
+        testLabelList.add(generatedTestLabel());
+        testLabelList.add(generatedTestLabel());
+
         userRepository.save(testUser);
         taskStatusRepository.save(testTaskStatus);
 
@@ -89,7 +102,15 @@ public class TaskControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
+                .supply(Select.field(Task::getLabels), () -> testLabelList)
                 .create();
+    }
+
+    private Label generatedTestLabel() {
+        var testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
+        return labelRepository.findByName(
+                testLabel.getName()).orElse(null);
     }
 
     @Test
@@ -164,6 +185,8 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTask.getTaskStatus().getSlug());
         assertThat(task.getAssignee().getId()).isEqualTo(testTask.getAssignee().getId());
+        assertThat(task.getLabels().get(0).getId()).isEqualTo(testTask.getLabels().get(0).getId());
+        assertThat(task.getLabels().get(1).getId()).isEqualTo(testTask.getLabels().get(1).getId());
     }
 
     @Test
@@ -212,15 +235,16 @@ public class TaskControllerTest {
     @Test
     public void testUpdate() throws Exception {
         taskRepository.save(testTask);
+        testLabelList.add(generatedTestLabel());
 
         var newData = Map.of(
                 "index", faker.number().positive(),
                 "assignee_id", userRepository.findByEmail("hexlet@example.com").get().getId(),
                 "title", faker.lorem().word(),
                 "status", taskStatusRepository.findBySlug("to_review").get().getSlug(),
-                "content", faker.lorem().sentence()
+                "content", faker.lorem().sentence(),
+                "labelIds", labelRepository.findById(1L)
         );
-
 
         var request = put(url + "/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -238,7 +262,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(newData.get("content"));
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-
+        assertThat(task.getLabels().size()).isEqualTo(testLabelList.size());
     }
 
     @Test
