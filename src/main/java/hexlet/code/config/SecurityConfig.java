@@ -53,9 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(mvcMatcherBuilder.pattern("/welcome")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern(baseUrl + "/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/h2console/")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/v3/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui/***")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern(POST, baseUrl + "/users")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern(GET, baseUrl + "/task_statuses")).permitAll()
-
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

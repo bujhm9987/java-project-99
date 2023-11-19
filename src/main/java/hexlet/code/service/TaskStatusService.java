@@ -28,6 +28,16 @@ public class TaskStatusService {
     }
 
     public TaskStatusDTO create(TaskStatusCreateDTO taskStatusData) {
+        var statusName = taskStatusData.getName();
+        var findName = taskStatusRepository.findByName(statusName);
+        if (findName.isPresent()) {
+            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findName));
+        }
+        var statusSlug = taskStatusData.getSlug();
+        var findSlug = taskStatusRepository.findByName(statusSlug);
+        if (findSlug.isPresent()) {
+            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findSlug));
+        }
         var taskStatus = taskStatusMapper.map(taskStatusData);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
@@ -42,6 +52,13 @@ public class TaskStatusService {
     public TaskStatusDTO update(TaskStatusUpdateDTO taskStatusData, Long id) {
         var taskStatus = taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
+        var statusSlug = taskStatusData.getSlug();
+        if (statusSlug != null) {
+            var findSlug = taskStatusRepository.findByName(statusSlug.get());
+            if (findSlug.isPresent()) {
+                throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findSlug));
+            }
+        }
         taskStatusMapper.update(taskStatusData, taskStatus);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);

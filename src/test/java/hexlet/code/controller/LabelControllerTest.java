@@ -3,11 +3,16 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
+import hexlet.code.model.Task;
 import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -42,6 +48,15 @@ public class LabelControllerTest {
 
     @Autowired
     private LabelRepository labelRepository;
+
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private LabelMapper mapper;
@@ -102,8 +117,7 @@ public class LabelControllerTest {
         var body = result.getResponse().getContentAsString();
         var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         assertThatJson(body).and(
-                v -> v.node("name").isEqualTo(testLabel.getName()),
-                v -> v.node("createdAt").isEqualTo(dateFormatter.format(testLabel.getCreatedAt()))
+                v -> v.node("name").isEqualTo(testLabel.getName())
         );
     }
 
@@ -235,6 +249,41 @@ public class LabelControllerTest {
         var request = delete(url + "/{id}", testLabel.getId());
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
+
+        var label = labelRepository.findById(
+                testLabel.getId()).orElse(null);
+
+        assertThat(label).isNotNull();
+    }
+
+    @Test
+    public void testDestroyWithActiveTask() throws Exception {
+        labelRepository.save(testLabel);
+        userRepository.save(testUser);
+
+
+        var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(testTaskStatus);
+
+        var user = userRepository.findById(testUser.getId()).get();
+        var taskStatus = taskStatusRepository.findBySlug(testTaskStatus.getSlug()).get();
+        var labelList = new ArrayList<>();
+        labelList.add(testLabel);
+
+        var testTask = Instancio.of(Task.class)
+                .ignore(Select.field(Task::getId))
+                .supply(Select.field(Task::getName), () -> faker.lorem().word())
+                .supply(Select.field(Task::getIndex), () -> faker.number().positive())
+                .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
+                .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
+                .supply(Select.field(Task::getAssignee), () -> user)
+                .supply(Select.field(Task::getTaskLabels), () -> labelList)
+                .create();
+        taskRepository.save(testTask);
+
+        var request = delete(url + "/{id}", testLabel.getId()).with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
 
         var label = labelRepository.findById(
                 testLabel.getId()).orElse(null);

@@ -31,5 +31,5 @@ public class TaskDTO {
 
     private String status;
 
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 }

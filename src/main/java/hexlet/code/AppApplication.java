@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.text.SimpleDateFormat;
+
 @SpringBootApplication
 @EnableJpaAuditing
 public class AppApplication {
@@ -17,4 +19,5 @@ public class AppApplication {
     public Faker getFaker() {
         return new Faker();
     }
+
 }

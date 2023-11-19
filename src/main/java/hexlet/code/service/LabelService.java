@@ -3,9 +3,12 @@ package hexlet.code.service;
 import hexlet.code.dto.LabelCreateDTO;
 import hexlet.code.dto.LabelDTO;
 import hexlet.code.dto.LabelUpdateDTO;
+import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
+import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,9 @@ import java.util.List;
 public class LabelService {
     @Autowired
     private LabelRepository labelRepository;
+
+     @Autowired
+     private TaskRepository taskRepository;
 
     @Autowired
     private LabelMapper labelMapper;
@@ -49,6 +55,18 @@ public class LabelService {
     public void delete(Long id) {
         var label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with id %s not found", id)));
-        labelRepository.deleteById(id);
+        var tasks = taskRepository.findAll();
+
+        var findTask = tasks.stream()
+                .flatMap(task -> task.getTaskLabels().stream())
+                .map(Label::getId)
+                .filter(id::equals)
+                .findAny();
+        if (findTask.isEmpty()) {
+            labelRepository.deleteById(id);
+        } else {
+            throw new ConstraintViolationException(String.format("Label with id %s has active tasks", id));
+        }
+
     }
 }

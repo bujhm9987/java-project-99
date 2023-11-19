@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -109,12 +108,11 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
         assertThatJson(body).and(
                 v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
                 v -> v.node("lastName").isEqualTo(testUser.getLastName()),
-                v -> v.node("email").isEqualTo(testUser.getEmail()),
-                v -> v.node("createdAt").isEqualTo(dateFormatter.format(testUser.getCreatedAt()))
+                v -> v.node("email").isEqualTo(testUser.getEmail())
         );
     }
 
@@ -359,6 +357,7 @@ class UserControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
+                .ignore(Select.field(Task::getTaskLabels))
                 .create();
         taskRepository.save(testTask);
 

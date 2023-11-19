@@ -26,25 +26,23 @@ public abstract class TaskMapper {
 
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee.id", source = "assigneeId")
-    @Mapping(target = "labels",
-            expression = "java(dto.getLabelIds().stream()" +
+    @Mapping(target = "taskLabels",
+            expression = "java(dto.getTaskLabelIds().stream()" +
                             ".map(i -> labelRepository.findById(i).get()).toList())")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
-    @Mapping(target = "labelIds", expression = "java(model.getLabels().stream().map(i -> i.getId()).toList())")
+    @Mapping(target = "taskLabelIds",
+            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).toList())")
     public abstract TaskDTO map(Task model);
 
-    /*@Mapping(target = "taskStatus.slug", source = "status")
-    @Mapping(target = "assignee.id", source = "assigneeId")
-    @Mapping(target = "labels",
-            expression = "java(dto.getLabelIds().get().stream().map(i -> labelRepository.findById(i)).toList())")*/
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
-    @Mapping(target = "labelIds", expression = "java(model.getLabels().stream().map(i -> i.getId()).toList())")
+    @Mapping(target = "taskLabelIds",
+            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).toList())")
     public abstract TaskCreateDTO mapToCreateDTO(Task model);
 
 }

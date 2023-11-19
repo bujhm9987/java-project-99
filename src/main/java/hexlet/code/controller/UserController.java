@@ -4,8 +4,19 @@ import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.exception.AccessUserDeniedException;
+import hexlet.code.model.User;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.links.Link;
+import io.swagger.v3.oas.annotations.links.LinkParameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,9 +39,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserUtils userUtils;
-
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Get list of users",
+            description = "Get list of users registered in the system",
+            responses = {
+                    @ApiResponse(
+                    responseCode = "200",
+                    description = "List of all users",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))
+                            )
+                    })
+            }
+    )
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<UserDTO>> getUsers() {
@@ -40,12 +64,48 @@ public class UserController {
                 .body(users);
     }
 
+    @Operation(
+            summary = "New User Registration",
+            description = "Registering new user in the system",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "User successfully created",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UserDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid data for user registration in the system",
+                            content = @Content)
+            }
+    )
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO createUser(@Valid @RequestBody UserCreateDTO userData) {
         return userService.create(userData);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Get user by ID",
+            description = "Get user registered in the system by ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "User found by ID",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UserDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "404", description = "User with that ID not found",
+                            content = @Content)
+            }
+    )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserDTO> showUser(@PathVariable long id) {
@@ -53,22 +113,53 @@ public class UserController {
                 .body(userService.findById(id));
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Update user by ID",
+            description = "Update user in the system by ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "User data has been successfully updated",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UserDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid user update data",
+                            content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Insufficient rights to update this user's data",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "User with that ID not found",
+                            content = @Content)
+            }
+    )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody @Valid UserUpdateDTO userData) {
-        if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessUserDeniedException("You do not have enough privileges to update this user");
-        }
         return ResponseEntity.ok()
                 .body(userService.update(userData, id));
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Delete user by ID",
+            description = "Deleting registered user from the system by ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "User deleted successfully",
+                            content = @Content),
+                    @ApiResponse(responseCode = "403",
+                            description = "There are insufficient privileges to delete this user",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "User with that ID not found",
+                            content = @Content)
+            }
+    )
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
-        if (userUtils.getCurrentUser().getId() != id) {
-            throw new AccessUserDeniedException("You do not have enough privileges to delete this user");
-        }
         userService.delete(id);
     }
 }

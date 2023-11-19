@@ -3,7 +3,14 @@ package hexlet.code.controller;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.service.TaskStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +33,21 @@ public class TaskStatusController {
     @Autowired
     private TaskStatusService taskStatusService;
 
+    @Operation(
+            summary = "Get list of task statuses",
+            description = "Get list of task statuses available in the system",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "List of all task statuses",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = TaskStatusDTO.class))
+                                    )
+                            })
+            }
+    )
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<TaskStatusDTO>> getTaskStatuses() {
@@ -35,12 +57,48 @@ public class TaskStatusController {
                 .body(taskStatuses);
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Create task status",
+            description = "Creating a new task status",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Task status successfully created",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = TaskStatusDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid data for creating a new task status",
+                            content = @Content)
+            }
+    )
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskStatusDTO createTaskStatus(@Valid @RequestBody TaskStatusCreateDTO taskStatusData) {
         return taskStatusService.create(taskStatusData);
     }
 
+    @Operation(
+            summary = "Get task status by ID",
+            description = "Get task status available in the system by ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Task status found by ID",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = TaskStatusDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "404", description = "Task status with that ID not found",
+                            content = @Content)
+            }
+    )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TaskStatusDTO> showTaskStatus(@PathVariable long id) {
@@ -48,6 +106,27 @@ public class TaskStatusController {
                 .body(taskStatusService.findById(id));
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Update task status by ID",
+            description = "Update task status available in the system by ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Task status updated successfully",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = TaskStatusDTO.class)
+                                    )
+                            }),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid task status update data",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Task status with that ID not found",
+                            content = @Content)
+            }
+    )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TaskStatusDTO> updateTaskStatus(@PathVariable long id,
@@ -56,6 +135,20 @@ public class TaskStatusController {
                 .body(taskStatusService.update(taskStatusData, id));
     }
 
+    @SecurityRequirement(name = "JWT")
+    @Operation(
+            summary = "Delete task status by ID",
+            description = "Deleting task status from the system by ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Task status deleted successfully",
+                            content = @Content),
+                    @ApiResponse(responseCode = "400",
+                            description = "There are active tasks with this task status",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Task status with that ID not found",
+                            content = @Content)
+            }
+    )
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTaskStatus(@PathVariable long id) {

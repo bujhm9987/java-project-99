@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +101,7 @@ public class TaskControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .supply(Select.field(Task::getLabels), () -> testLabelList)
+                .supply(Select.field(Task::getTaskLabels), () -> testLabelList)
                 .create();
     }
 
@@ -143,14 +142,13 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         assertThatJson(body).and(
                 v -> v.node("index").isEqualTo(testTask.getIndex()),
                 v -> v.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                v -> v.node("createdAt").isEqualTo(dateFormatter.format(testTask.getCreatedAt()))
+                v -> v.node("taskLabelIds").isEqualTo(testTask.getTaskLabels().stream().map(Label::getId).toList())
         );
     }
 
@@ -185,8 +183,8 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTask.getTaskStatus().getSlug());
         assertThat(task.getAssignee().getId()).isEqualTo(testTask.getAssignee().getId());
-        assertThat(task.getLabels().get(0).getId()).isEqualTo(testTask.getLabels().get(0).getId());
-        assertThat(task.getLabels().get(1).getId()).isEqualTo(testTask.getLabels().get(1).getId());
+        assertThat(task.getTaskLabels().get(0).getId()).isEqualTo(testTask.getTaskLabels().get(0).getId());
+        assertThat(task.getTaskLabels().get(1).getId()).isEqualTo(testTask.getTaskLabels().get(1).getId());
     }
 
     @Test
@@ -235,7 +233,6 @@ public class TaskControllerTest {
     @Test
     public void testUpdate() throws Exception {
         taskRepository.save(testTask);
-        testLabelList.add(generatedTestLabel());
 
         var newData = Map.of(
                 "index", faker.number().positive(),
@@ -243,7 +240,7 @@ public class TaskControllerTest {
                 "title", faker.lorem().word(),
                 "status", taskStatusRepository.findBySlug("to_review").get().getSlug(),
                 "content", faker.lorem().sentence(),
-                "labelIds", labelRepository.findById(1L)
+                "taskLabelIds", labelRepository.findById(1L).stream().map(Label::getId).toList()
         );
 
         var request = put(url + "/{id}", testTask.getId()).with(token)
@@ -262,7 +259,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(newData.get("content"));
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-        assertThat(task.getLabels().size()).isEqualTo(testLabelList.size());
+        assertThat(task.getTaskLabels().stream().map(Label::getId).toList()).isEqualTo(newData.get("taskLabelIds"));
     }
 
     @Test
@@ -307,6 +304,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
+        assertThat(task.getTaskLabels().size()).isEqualTo(testTask.getTaskLabels().size());
     }
 
     @Test
