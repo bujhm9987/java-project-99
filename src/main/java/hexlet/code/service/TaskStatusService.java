@@ -56,7 +56,8 @@ public class TaskStatusService {
         if (statusSlug != null) {
             var findSlug = taskStatusRepository.findByName(statusSlug.get());
             if (findSlug.isPresent()) {
-                throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findSlug));
+                throw new ConstraintViolationException(
+                        String.format("TaskStatus with name %s already exists", findSlug));
             }
         }
         taskStatusMapper.update(taskStatusData, taskStatus);

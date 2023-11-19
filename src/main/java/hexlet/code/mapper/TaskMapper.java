@@ -22,13 +22,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class TaskMapper {
 
     @Autowired
-    public LabelRepository labelRepository;
+    private LabelRepository labelRepository;
+
+    public LabelRepository getLabelRepository() {
+        return this.labelRepository;
+    }
 
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee.id", source = "assigneeId")
     @Mapping(target = "taskLabels",
-            expression = "java(dto.getTaskLabelIds().stream()" +
-                            ".map(i -> labelRepository.findById(i).get()).toList())")
+            expression = "java(dto.getTaskLabelIds().stream()"
+                    + ".map(i -> getLabelRepository().findById(i).get()).toList())")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "status", source = "taskStatus.slug")

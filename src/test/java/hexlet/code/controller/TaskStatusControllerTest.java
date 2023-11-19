@@ -23,7 +23,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
