@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
+import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
@@ -73,6 +74,8 @@ public class TaskControllerTest {
 
     private Task testTask;
 
+    private TaskStatus taskStatus;
+
     private List<Label> testLabelList = new ArrayList<>();
 
     @Value("${base-url}" + "/tasks")
@@ -92,7 +95,7 @@ public class TaskControllerTest {
         taskStatusRepository.save(testTaskStatus);
 
         var user = userRepository.findById(testUser.getId()).get();
-        var taskStatus = taskStatusRepository.findBySlug(testTaskStatus.getSlug()).get();
+        taskStatus = taskStatusRepository.findBySlug(testTaskStatus.getSlug()).get();
 
         testTask = Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
@@ -336,12 +339,43 @@ public class TaskControllerTest {
                 .content(om.writeValueAsString(newData));
 
         mockMvc.perform(request)
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateWithNotPresentedLabel() throws Exception {
+        taskRepository.save(testTask);
+
+        var newData = Map.of(
+                "taskLabelIds", "-1"
+        );
+
+        var request = put(url + "/{id}", testTask.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(newData));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateWithNotPresentedUser() throws Exception {
+        taskRepository.save(testTask);
+
+        var newData = Map.of(
+                "assignee_id", "-1"
+        );
+
+        var request = put(url + "/{id}", testTask.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(newData));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testDestroy() throws Exception {
-
         taskRepository.save(testTask);
 
         var request = delete(url + "/{id}", testTask.getId()).with(token);
@@ -356,7 +390,6 @@ public class TaskControllerTest {
 
     @Test
     public void testDestroyWithoutAuthentication() throws Exception {
-
         taskRepository.save(testTask);
 
         var request = delete(url + "/{id}", testTask.getId());
@@ -367,5 +400,89 @@ public class TaskControllerTest {
                 testTask.getId()).orElse(null);
 
         assertThat(task).isNotNull();
+    }
+
+    @Test
+    public void testFilteringWithTitleCont() throws Exception {
+        taskRepository.save(testTask);
+        var testTaskTitle = testTask.getName();
+
+        var result = mockMvc.perform(get(url + "?titleCont=" + testTaskTitle).with(token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("title").asString().containsIgnoringCase(testTaskTitle)));
+    }
+
+    @Test
+    public void testFilteringWithAssigneeId() throws Exception {
+        taskRepository.save(testTask);
+        var testTaskAssigneeId = testTask.getAssignee().getId();
+        var result = mockMvc.perform(get(url + "?assigneeId=" + testTaskAssigneeId).with(token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("assignee_id").isEqualTo(testTaskAssigneeId)));
+    }
+
+    @Test
+    public void testFilteringWithStatus() throws Exception {
+        taskRepository.save(testTask);
+        var testTaskStatusSlug = testTask.getTaskStatus().getSlug();
+        var result = mockMvc.perform(get(url + "?status=" + testTaskStatusSlug).with(token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("status").asString().containsIgnoringCase(testTaskStatusSlug)));
+    }
+
+    @Test
+    public void testFilteringWithLabelId() throws Exception {
+        taskRepository.save(testTask);
+        var testTaskLabelId = testTask.getTaskLabels().get(0).getId();
+        var result = mockMvc.perform(get(url + "?labelId=" + testTaskLabelId).with(token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("taskLabelIds").isArray().contains(testTaskLabelId)));
+    }
+
+    @Test
+    public void testFilteringWithAllParameters() throws Exception {
+        taskRepository.save(testTask);
+        var testTaskTitle = testTask.getName();
+        var testTaskAssigneeId = testTask.getAssignee().getId();
+        var testTaskStatusSlug = testTask.getTaskStatus().getSlug();
+        var testTaskLabelId = testTask.getTaskLabels().get(0).getId();
+        var result = mockMvc.perform(get(url + "?titleCont=" + testTaskTitle + "&assigneeId="
+                        + testTaskAssigneeId + "&status=" + testTaskStatusSlug + "&labelId=" + testTaskLabelId)
+                        .with(token))
+                .andExpect(status().isOk())
+                .andReturn();
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("title").asString().containsIgnoringCase(testTaskTitle)));
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("assignee_id").isEqualTo(testTaskAssigneeId)));
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("status").asString().containsIgnoringCase(testTaskStatusSlug)));
+        assertThatJson(body).isArray().allSatisfy(element ->
+                assertThatJson(element)
+                        .and(v -> v.node("taskLabelIds").isArray().contains(testTaskLabelId)));
     }
 }

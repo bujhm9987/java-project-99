@@ -31,12 +31,12 @@ public class TaskStatusService {
         var statusName = taskStatusData.getName();
         var findName = taskStatusRepository.findByName(statusName);
         if (findName.isPresent()) {
-            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findName));
+            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", statusName));
         }
         var statusSlug = taskStatusData.getSlug();
         var findSlug = taskStatusRepository.findByName(statusSlug);
         if (findSlug.isPresent()) {
-            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", findSlug));
+            throw new ConstraintViolationException(String.format("TaskStatus with name %s already exists", statusSlug));
         }
         var taskStatus = taskStatusMapper.map(taskStatusData);
         taskStatusRepository.save(taskStatus);
@@ -57,7 +57,7 @@ public class TaskStatusService {
             var findSlug = taskStatusRepository.findByName(statusSlug.get());
             if (findSlug.isPresent()) {
                 throw new ConstraintViolationException(
-                        String.format("TaskStatus with name %s already exists", findSlug));
+                        String.format("TaskStatus with name %s already exists", statusSlug.get()));
             }
         }
         taskStatusMapper.update(taskStatusData, taskStatus);

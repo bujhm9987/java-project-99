@@ -5,6 +5,7 @@ import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
+import lombok.Getter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -13,6 +14,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Getter
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -24,15 +26,11 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
-    public LabelRepository getLabelRepository() {
-        return this.labelRepository;
-    }
-
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee.id", source = "assigneeId")
     @Mapping(target = "taskLabels",
             expression = "java(dto.getTaskLabelIds().stream()"
-                    + ".map(i -> getLabelRepository().findById(i).get()).toList())")
+                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).toList())")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "status", source = "taskStatus.slug")

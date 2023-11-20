@@ -164,6 +164,19 @@ public class LabelControllerTest {
     }
 
     @Test
+    public void testCreateWhitAlreadyExistName() throws Exception {
+        testLabel.setName("bug");
+        var dto = mapper.mapToCreateDTO(testLabel);
+
+        var request = post(url).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testCreateWithAuthentication() throws Exception {
         testLabel.setName("Unique name");
         var dto = mapper.mapToCreateDTO(testLabel);
@@ -204,6 +217,23 @@ public class LabelControllerTest {
 
         var newData = Map.of(
                 "name", "U"
+        );
+
+        var request = put(url + "/{id}", testLabel.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(newData));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateWhitAlreadyExistName() throws Exception {
+        labelRepository.save(testLabel);
+        var testLabelName = testLabel.getName();
+
+        var newData = Map.of(
+                "name", testLabelName
         );
 
         var request = put(url + "/{id}", testLabel.getId()).with(token)

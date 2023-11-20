@@ -2,6 +2,7 @@ package hexlet.code.service;
 
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
+import hexlet.code.dto.TaskParamsDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +36,12 @@ public class TaskService {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
 
-    public List<TaskDTO> getAll() {
-        var tasks = taskRepository.findAll();
+    @Autowired
+    private TaskSpecification specBuilder;
+
+    public List<TaskDTO> getAll(TaskParamsDTO paramsDTO) {
+        var spec = specBuilder.build(paramsDTO);
+        var tasks = taskRepository.findAll(spec);
         return tasks.stream()
                 .map(taskMapper::map)
                 .collect(Collectors.toList());
@@ -58,14 +64,14 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        var taskLabels = taskData.getTaskLabelIds();
-        if (!taskLabels.isEmpty()) {
-            var labels = taskLabels.stream()
-                            .map(i -> labelRepository.findById(i)
-                                            .orElseThrow(() -> new ConstraintViolationException(String
-                                            .format("Label with id %s not found", i))))
-                            .collect(Collectors.toList());
-            task.setTaskLabels(labels);
+        var taskLabelIds = taskData.getTaskLabelIds();
+        if (taskLabelIds != null) {
+            var newLabels = taskLabelIds.stream()
+                    .map(i -> labelRepository.findById(i)
+                            .orElseThrow(() -> new ConstraintViolationException(String
+                                    .format("Label with id %s not found", i))))
+                    .toList();
+            task.setTaskLabels(newLabels);
         }
 
         taskRepository.save(task);
@@ -87,14 +93,16 @@ public class TaskService {
         var taskDataSlug = taskData.getStatus();
         if (taskDataSlug != null) {
             var status = taskStatusRepository.findBySlug((taskDataSlug).get())
-                    .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
+                    .orElseThrow(() -> new ConstraintViolationException(String
+                            .format("Status with slug %s not found", taskDataSlug.get())));
             task.setTaskStatus(status);
         }
 
         var taskDataUserId = taskData.getAssigneeId();
         if (taskDataUserId != null) {
             var assignee = userRepository.findById((taskDataUserId).get())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                    .orElseThrow(() -> new ConstraintViolationException(String
+                            .format("User with id %s not found", taskDataUserId.get())));
             task.setAssignee(assignee);
         }
 

@@ -66,7 +66,7 @@ public class UserService {
             var findUser = userRepository.findByEmail(userDataEmail.get());
             if (findUser.isPresent()) {
                 throw new ConstraintViolationException(
-                        String.format("User with email %s already exists", userDataEmail));
+                        String.format("User with email %s already exists", userDataEmail.get()));
             }
         }
         userMapper.update(userData, user);

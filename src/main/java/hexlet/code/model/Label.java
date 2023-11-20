@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class Label implements BaseEntity {
     private long id;
 
     @NotNull
+    @Column(unique = true)
     @Size(min = 3, max = 1000)
     private String name;
 
