@@ -86,6 +86,6 @@ sentry {
 	includeSourceContext = true
 
 	org = "bujhm9987"
-	projectName = "task-manager"
+	projectName = "task_manager"
 	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
