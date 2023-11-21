@@ -8,6 +8,7 @@ plugins {
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
 	id("io.freefair.lombok") version "8.4"
+	id("io.sentry.jvm.gradle") version "3.14.0"
 }
 
 group = "hexlet.code"
@@ -70,4 +71,15 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "bujhm9987"
+	projectName = "task-manager"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
