@@ -10,6 +10,21 @@
 
 ### Описание
 
-https://task-manager-4qva.onrender.com
-
 "Менеджер задач" – – система управления задачами, подобная http://www.redmine.org/. Она позволяет ставить задачи, назначать исполнителей и менять их статусы. Для работы с системой требуется регистрация и аутентификация.
+
+[Demo](https://task-manager-4qva.onrender.com/)
+
+[API documentation](https://task-manager-4qva.onrender.com/swagger-ui/index.html)
+
+## Setup
+```bash
+make setup
+```
+
+## Run
+```bash
+make start
+# Open http://localhost:8080
+# Username: hexlet@example.com
+# Password: qwerty
+```
