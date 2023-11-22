@@ -4,10 +4,6 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
 
 sentry:
   dsn: https://03c959934a22e937adcdb6fd8447601d@o4506263061856256.ingest.sentry.io/4506265617367040
