@@ -1,7 +1,5 @@
 setup:
-	npm install
 	./gradlew wrapper --gradle-version 8.4
-	./gradlew build
 
 frontend:
 	make -C frontend start

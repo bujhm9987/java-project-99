@@ -16,8 +16,8 @@ jobs:
           java-version: '20'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build
+        with:
+          arguments: build
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         if: ${{ github.event_name == 'push' }}
