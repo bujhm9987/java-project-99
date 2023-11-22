@@ -73,19 +73,17 @@ tasks.jacocoTestReport {
 	}
 }
 
-buildscript {
+/*buildscript {
 	repositories {
 		mavenCentral()
 	}
-}
+}*/
 
-sentry {
-	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-	// This enables source context, allowing you to see your source
-	// code as part of your stack traces in Sentry.
-	includeSourceContext = true
-
-	org = "bujhm9987"
-	projectName = "task_manager"
-	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+if (System.getenv("APP_ENV") == "production") {
+	sentry {
+		includeSourceContext = true
+		org = "bujhm9987"
+		projectName = "task_manager"
+		authToken = System.getenv("SENTRY_AUTH_TOKEN")
+	}
 }

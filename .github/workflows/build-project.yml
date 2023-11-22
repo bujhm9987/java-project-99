@@ -22,7 +22,6 @@ jobs:
         uses: paambaati/codeclimate-action@v5.0.0
         if: ${{ github.event_name == 'push' }}
         env:
-          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
           JACOCO_SOURCE_PATH: src/main/java
         with:
