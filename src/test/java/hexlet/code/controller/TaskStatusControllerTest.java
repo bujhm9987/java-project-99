@@ -311,7 +311,7 @@ class TaskStatusControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> status)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .ignore(Select.field(Task::getTaskLabels))
+                .ignore(Select.field(Task::getLabels))
                 .create();
         taskRepository.save(testTask);
 

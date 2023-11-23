@@ -357,7 +357,7 @@ class UserControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .ignore(Select.field(Task::getTaskLabels))
+                .ignore(Select.field(Task::getLabels))
                 .create();
         taskRepository.save(testTask);
 

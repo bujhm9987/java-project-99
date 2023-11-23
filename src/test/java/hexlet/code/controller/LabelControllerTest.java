@@ -307,7 +307,7 @@ public class LabelControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .supply(Select.field(Task::getTaskLabels), () -> labelSet)
+                .supply(Select.field(Task::getLabels), () -> labelSet)
                 .create();
         taskRepository.save(testTask);
 

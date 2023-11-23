@@ -105,7 +105,7 @@ public class TaskControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .supply(Select.field(Task::getTaskLabels), () -> testLabelSet)
+                .supply(Select.field(Task::getLabels), () -> testLabelSet)
                 .create();
     }
 
@@ -152,7 +152,7 @@ public class TaskControllerTest {
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                v -> v.node("taskLabelIds").isEqualTo(testTask.getTaskLabels().stream()
+                v -> v.node("labelIds").isEqualTo(testTask.getLabels().stream()
                         .map(Label::getId).collect(Collectors.toSet()))
         );
     }
@@ -246,7 +246,7 @@ public class TaskControllerTest {
                 "title", faker.lorem().word(),
                 "status", taskStatusRepository.findBySlug("to_review").get().getSlug(),
                 "content", faker.lorem().sentence(),
-                "taskLabelIds", labelRepository.findById(1L).stream().map(Label::getId).toList()
+                "labelIds", labelRepository.findById(1L).stream().map(Label::getId).toList()
         );
 
         var request = put(url + "/{id}", testTask.getId()).with(token)
@@ -265,7 +265,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(newData.get("content"));
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-        assertThat(task.getTaskLabels().stream().map(Label::getId).toList()).isEqualTo(newData.get("taskLabelIds"));
+        assertThat(task.getLabels().stream().map(Label::getId).toList()).isEqualTo(newData.get("labelIds"));
     }
 
     @Test
@@ -310,7 +310,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-        assertThat(task.getTaskLabels().size()).isEqualTo(testTask.getTaskLabels().size());
+        assertThat(task.getLabels().size()).isEqualTo(testTask.getLabels().size());
     }
 
     @Test
@@ -350,7 +350,7 @@ public class TaskControllerTest {
         taskRepository.save(testTask);
 
         var newData = Map.of(
-                "taskLabelIds", "-1"
+                "labelIds", "-1"
         );
 
         var request = put(url + "/{id}", testTask.getId()).with(token)
@@ -451,15 +451,15 @@ public class TaskControllerTest {
     @Test
     public void testFilteringWithLabelId() throws Exception {
         taskRepository.save(testTask);
-        var testTaskLabelId = 1L; //testTask.getTaskLabels().get(0).getId();
-        var result = mockMvc.perform(get(url + "?labelId=" + testTaskLabelId).with(token))
+        var testLabelId = "1"; //testTask.getTaskLabels().get(0).getId();
+        var result = mockMvc.perform(get(url + "?labelId=" + testLabelId).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray().allSatisfy(element ->
                 assertThatJson(element)
-                        .and(v -> v.node("taskLabelIds").isArray().contains(testTaskLabelId)));
+                        .and(v -> v.node("labelIds").isArray().contains(testLabelId)));
     }
 
     @Test
@@ -468,9 +468,9 @@ public class TaskControllerTest {
         var testTaskTitle = testTask.getName();
         var testTaskAssigneeId = testTask.getAssignee().getId();
         var testTaskStatusSlug = testTask.getTaskStatus().getSlug();
-        var testTaskLabelId = 1L; //testTask.getTaskLabels().get(0).getId();
+        var testLabelId = "1"; //testTask.getTaskLabels().get(0).getId();
         var result = mockMvc.perform(get(url + "?titleCont=" + testTaskTitle + "&assigneeId="
-                        + testTaskAssigneeId + "&status=" + testTaskStatusSlug + "&labelId=" + testTaskLabelId)
+                        + testTaskAssigneeId + "&status=" + testTaskStatusSlug + "&labelId=" + testLabelId)
                         .with(token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -486,6 +486,6 @@ public class TaskControllerTest {
                         .and(v -> v.node("status").asString().containsIgnoringCase(testTaskStatusSlug)));
         assertThatJson(body).isArray().allSatisfy(element ->
                 assertThatJson(element)
-                        .and(v -> v.node("taskLabelIds").isArray().contains(testTaskLabelId)));
+                        .and(v -> v.node("labelIds").isArray().contains(testLabelId)));
     }
 }

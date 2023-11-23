@@ -48,7 +48,7 @@ public class Task implements BaseEntity {
     private User assignee;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Label> taskLabels = new HashSet<>();
+    private Set<Label> labels = new HashSet<>();
 
     @CreatedDate
     private Date createdAt;

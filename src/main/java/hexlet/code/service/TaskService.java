@@ -64,14 +64,14 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        var taskLabelIds = taskData.getTaskLabelIds();
+        var taskLabelIds = taskData.getLabelIds();
         if (taskLabelIds != null) {
             var newLabels = taskLabelIds.stream()
                     .map(i -> labelRepository.findById(i)
                             .orElseThrow(() -> new ConstraintViolationException(String
                                     .format("Label with id %s not found", i))))
                     .collect(Collectors.toSet());
-            task.setTaskLabels(newLabels);
+            task.setLabels(newLabels);
         }
 
         taskRepository.save(task);
@@ -106,14 +106,14 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        var taskLabelIds = taskData.getTaskLabelIds();
+        var taskLabelIds = taskData.getLabelIds();
         if (taskLabelIds != null) {
             var newLabels = taskLabelIds.get().stream()
                     .map(i -> labelRepository.findById(i)
                             .orElseThrow(() -> new ConstraintViolationException(String
                                     .format("Label with id %s not found", i))))
                     .collect(Collectors.toSet());
-            task.setTaskLabels(newLabels);
+            task.setLabels(newLabels);
         }
 
         taskRepository.save(task);

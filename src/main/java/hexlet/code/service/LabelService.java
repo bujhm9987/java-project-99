@@ -68,7 +68,7 @@ public class LabelService {
         var tasks = taskRepository.findAll();
 
         var findTask = tasks.stream()
-                .flatMap(task -> task.getTaskLabels().stream())
+                .flatMap(task -> task.getLabels().stream())
                 .map(Label::getId)
                 .filter(id::equals)
                 .findAny();
