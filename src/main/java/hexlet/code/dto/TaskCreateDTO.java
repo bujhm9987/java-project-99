@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,5 +28,5 @@ public class TaskCreateDTO {
     @NotNull
     private String status;
 
-    private List<Long> taskLabelIds;
+    private Set<Long> taskLabelIds;
 }

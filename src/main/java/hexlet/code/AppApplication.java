@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+
 @SpringBootApplication
 @EnableJpaAuditing
 @OpenAPIDefinition(
@@ -26,4 +27,5 @@ public class AppApplication {
     public Faker getFaker() {
         return new Faker();
     }
+
 }

@@ -15,9 +15,9 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -48,7 +48,7 @@ public class Task implements BaseEntity {
     private User assignee;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Label> taskLabels = new ArrayList<>();
+    private Set<Label> taskLabels = new HashSet<>();
 
     @CreatedDate
     private Date createdAt;

@@ -70,7 +70,7 @@ public class TaskService {
                     .map(i -> labelRepository.findById(i)
                             .orElseThrow(() -> new ConstraintViolationException(String
                                     .format("Label with id %s not found", i))))
-                    .toList();
+                    .collect(Collectors.toSet());
             task.setTaskLabels(newLabels);
         }
 
@@ -112,7 +112,7 @@ public class TaskService {
                     .map(i -> labelRepository.findById(i)
                             .orElseThrow(() -> new ConstraintViolationException(String
                                     .format("Label with id %s not found", i))))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             task.setTaskLabels(newLabels);
         }
 

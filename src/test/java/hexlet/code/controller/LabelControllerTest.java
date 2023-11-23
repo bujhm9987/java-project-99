@@ -24,7 +24,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -297,8 +297,8 @@ public class LabelControllerTest {
 
         var user = userRepository.findById(testUser.getId()).get();
         var taskStatus = taskStatusRepository.findBySlug(testTaskStatus.getSlug()).get();
-        var labelList = new ArrayList<>();
-        labelList.add(testLabel);
+        var labelSet = new HashSet<>();
+        labelSet.add(testLabel);
 
         var testTask = Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
@@ -307,7 +307,7 @@ public class LabelControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
-                .supply(Select.field(Task::getTaskLabels), () -> labelList)
+                .supply(Select.field(Task::getTaskLabels), () -> labelSet)
                 .create();
         taskRepository.save(testTask);
 

@@ -14,6 +14,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.stream.Collectors;
+
 @Getter
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
@@ -26,17 +28,19 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
+    private Collectors collectors;
+
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee.id", source = "assigneeId")
     @Mapping(target = "taskLabels",
             expression = "java(dto.getTaskLabelIds().stream()"
-                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).toList())")
+                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).collect(getCollectors().toSet()))")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "taskLabelIds",
-            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).toList())")
+            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).collect(getCollectors().toSet()))")
     public abstract TaskDTO map(Task model);
 
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
@@ -44,7 +48,7 @@ public abstract class TaskMapper {
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "taskLabelIds",
-            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).toList())")
+            expression = "java(model.getTaskLabels().stream().map(i -> i.getId()).collect(getCollectors().toSet()))")
     public abstract TaskCreateDTO mapToCreateDTO(Task model);
 
 }
