@@ -20,4 +20,4 @@ COPY ./ .
 
 RUN gradle stage
 
-CMD ./build/install/App/bin/App
+CMD ./build/install/app/bin/app
