@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("${base-url}" + "/task_statuses")
+@RequestMapping("/api/task_statuses")
 public class TaskStatusController {
     @Autowired
     private TaskStatusService taskStatusService;

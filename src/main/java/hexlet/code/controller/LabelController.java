@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("${base-url}" + "/labels")
+@RequestMapping("/api/labels")
 public class LabelController {
 
     @Autowired

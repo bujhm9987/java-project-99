@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("${base-url}" + "/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
 
     @Autowired

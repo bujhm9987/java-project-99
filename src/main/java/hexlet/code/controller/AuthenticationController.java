@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${base-url}" + "/login")
+@RequestMapping("/api/login")
 public class AuthenticationController {
 
     private final JWTUtils jwtUtils;
