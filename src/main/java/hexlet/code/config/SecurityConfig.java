@@ -1,6 +1,6 @@
 package hexlet.code.config;
 
-import hexlet.code.service.CustomUserDetailsService;
+import hexlet.code.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final CustomUserDetailsService userService;
+    private final UserService userService;
 
     private final JwtDecoder jwtDecoder;
 

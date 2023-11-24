@@ -7,16 +7,21 @@ import hexlet.code.exception.AccessUserDeniedException;
 import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsManager {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -87,5 +92,39 @@ public class UserService {
         } else {
             throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
         }
+    }
+
+    @Override
+    public void createUser(UserDetails user) {
+        var newUser = new User();
+        newUser.setEmail(user.getUsername());
+        newUser.setPassword(encoder.encode(user.getPassword()));
+        userRepository.save(newUser);
+    }
+
+    @Override
+    public void updateUser(UserDetails user) {
+        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+    }
+
+    @Override
+    public void deleteUser(String username) {
+        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+    }
+
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+        throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
+    }
+
+    @Override
+    public boolean userExists(String username) {
+        throw new UnsupportedOperationException("Unimplemented method 'userExists'");
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
