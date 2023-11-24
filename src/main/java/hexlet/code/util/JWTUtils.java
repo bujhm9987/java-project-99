@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 @RequiredArgsConstructor
 public class JWTUtils {
 
-    private final JwtEncoder encoder;
+    private final JwtEncoder jwtEncoder;
 
     public String generateToken(String username) {
         Instant now = Instant.now();
@@ -23,6 +23,6 @@ public class JWTUtils {
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .subject(username)
                 .build();
-        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 }
