@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users" /*"${base-url}" + "/users"*/)
+@RequestMapping("${base-url}" + "/users")
 @RequiredArgsConstructor
 public class UserController {
 
