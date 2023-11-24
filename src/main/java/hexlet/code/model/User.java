@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -43,7 +42,6 @@ public class User implements UserDetails, BaseEntity {
 
     private String lastName;
 
-    @NotBlank
     @Column(unique = true)
     @Email
     private String email;
@@ -59,7 +57,7 @@ public class User implements UserDetails, BaseEntity {
     private Date updatedAt;
 
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private List<Task> tasks = new ArrayList<>();
+    private List<Task> tasks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
