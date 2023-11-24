@@ -1,4 +1,4 @@
-package hexlet.code.service;
+/*package hexlet.code.service;
 
 import hexlet.code.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,3 +45,4 @@ public class CustomUserDetailsService implements UserDetailsManager {
         return user;
     }
 }
+*/

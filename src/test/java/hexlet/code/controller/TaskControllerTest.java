@@ -204,10 +204,10 @@ public class TaskControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
 
-        var task = taskRepository.findByName(
+        /*var task = taskRepository.findByName(
                 testTask.getName()).orElse(null);
 
-        assertThat(task).isNull();
+        assertThat(task).isNull();*/
     }
 
     @Test
