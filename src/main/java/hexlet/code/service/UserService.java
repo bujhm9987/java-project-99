@@ -8,6 +8,7 @@ import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserService implements UserDetailsManager {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -86,12 +90,19 @@ public class UserService implements UserDetailsManager {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new AccessUserDeniedException("You do not have enough privileges to update this user");
         }
-        var userTasks = user.getTasks();
+
+        var userTasks = taskRepository.findByAssigneeId(userUtils.getCurrentUser().getId());
         if (userTasks.isEmpty()) {
             userRepository.deleteById(id);
         } else {
             throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
         }
+        /*var userTasks = user.getTasks();
+        if (userTasks.isEmpty()) {
+            userRepository.deleteById(id);
+        } else {
+            throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
+        }*/
     }
 
     @Override
