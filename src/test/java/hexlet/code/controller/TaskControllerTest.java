@@ -152,7 +152,7 @@ public class TaskControllerTest {
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                v -> v.node("labelIds").isEqualTo(testTask.getLabels().stream()
+                v -> v.node("taskLabelIds").isEqualTo(testTask.getLabels().stream()
                         .map(Label::getId).collect(Collectors.toSet()))
         );
     }
