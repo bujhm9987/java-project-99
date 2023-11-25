@@ -29,7 +29,7 @@ public abstract class TaskMapper {
     private Collectors collectors;
 
     @Mapping(target = "taskStatus.slug", source = "status")
-    @Mapping(target = "assignee.id", source = "assigneeId")
+    @Mapping(target = "assignee", source = "assigneeId")
     /*@Mapping(target = "labels",
             expression = "java(dto.getLabelIds().stream()"
                     + ".map(i -> getLabelRepository().findById(i).orElse(null)).collect(getCollectors().toSet()))")*/
