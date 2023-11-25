@@ -68,11 +68,11 @@ public class TaskStatusService {
     public void delete(Long id) {
         var taskStatus = taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
-        var tasks = taskStatus.getTasks();
-        if (tasks.isEmpty()) {
+        /*var tasks = taskStatus.getTasks();
+        if (tasks.isEmpty()) {*/
             taskStatusRepository.deleteById(id);
-        } else {
+        /*} else {
             throw new ConstraintViolationException(String.format("TaskStatus with id %s is used in tasks", id));
-        }
+        }*/
     }
 }

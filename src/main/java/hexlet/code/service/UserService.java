@@ -86,13 +86,13 @@ public class UserService implements UserDetailsManager {
         if (userUtils.getCurrentUser().getId() != id) {
             throw new AccessUserDeniedException("You do not have enough privileges to update this user");
         }
-        var userTasks = user.getTasks();
+        /*var userTasks = user.getTasks();
         if (userTasks.isEmpty()) {
             userRepository.deleteById(id);
         } else {
             throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
-        }
-        //userRepository.deleteById(id);
+        }*/
+        userRepository.deleteById(id);
     }
 
     @Override
