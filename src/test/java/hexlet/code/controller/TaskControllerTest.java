@@ -246,7 +246,7 @@ public class TaskControllerTest {
                 "title", faker.lorem().word(),
                 "status", taskStatusRepository.findBySlug("to_review").get().getSlug(),
                 "content", faker.lorem().sentence(),
-                "labelIds", labelRepository.findById(1L).stream().map(Label::getId).toList()
+                "taskLabelIds", labelRepository.findById(1L).stream().map(Label::getId).toList()
         );
 
         var request = put(url + "/{id}", testTask.getId()).with(token)
@@ -265,7 +265,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(newData.get("content"));
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-        assertThat(task.getLabels().stream().map(Label::getId).toList()).isEqualTo(newData.get("labelIds"));
+        assertThat(task.getLabels().stream().map(Label::getId).toList()).isEqualTo(newData.get("taskLabelIds"));
     }
 
     @Test
@@ -350,7 +350,7 @@ public class TaskControllerTest {
         taskRepository.save(testTask);
 
         var newData = Map.of(
-                "labelIds", "-1"
+                "taskLabelIds", "-1"
         );
 
         var request = put(url + "/{id}", testTask.getId()).with(token)

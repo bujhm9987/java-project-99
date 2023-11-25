@@ -11,6 +11,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.stream.Collectors;
 
@@ -28,6 +29,8 @@ public abstract class TaskMapper {
 
     private Collectors collectors;
 
+    private JsonNullable jsonNullable;
+
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee", source = "assigneeId")
     /*@Mapping(target = "labels",
@@ -39,7 +42,8 @@ public abstract class TaskMapper {
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "taskLabelIds",
-            expression = "java(model.getLabels().stream().map(i -> i.getId()).collect(getCollectors().toSet()))")
+            expression = "java(getJsonNullable().of(model.getLabels().stream()"
+                    + ".map(Label::getId).collect(getCollectors().toSet())))")
     public abstract TaskDTO map(Task model);
 
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);

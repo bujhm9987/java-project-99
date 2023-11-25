@@ -30,7 +30,7 @@ public class Task implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank
     private String name;
