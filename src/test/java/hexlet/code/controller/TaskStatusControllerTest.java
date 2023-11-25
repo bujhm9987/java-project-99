@@ -2,6 +2,7 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
@@ -10,6 +11,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -294,7 +296,7 @@ class TaskStatusControllerTest {
         assertThat(taskStatus).isNotNull();
     }
 
-/*    @Test
+    @Test
     public void testDestroyWithActiveTask() throws Exception {
         taskStatusRepository.save(testTaskStatus);
         userRepository.save(testUser);
@@ -321,5 +323,5 @@ class TaskStatusControllerTest {
                 testTaskStatus.getId()).orElse(null);
 
         assertThat(taskStatus).isNotNull();
-    }*/
+    }
 }
