@@ -39,10 +39,10 @@ public class Task implements BaseEntity {
     private String description;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne//(fetch = FetchType.EAGER)
     private TaskStatus taskStatus;
 
-    @ManyToOne
+    @ManyToOne//(fetch = FetchType.EAGER)
     private User assignee;
 
     @ManyToMany(fetch = FetchType.EAGER)
