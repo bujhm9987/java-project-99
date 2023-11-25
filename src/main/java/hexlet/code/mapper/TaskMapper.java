@@ -4,7 +4,6 @@ import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Task;
-import hexlet.code.repository.LabelRepository;
 import lombok.Getter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,7 +11,6 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Collectors;
 
@@ -25,16 +23,17 @@ import java.util.stream.Collectors;
 )
 public abstract class TaskMapper {
 
-    @Autowired
-    private LabelRepository labelRepository;
+    /*@Autowired
+    private LabelRepository labelRepository;*/
 
     private Collectors collectors;
 
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee.id", source = "assigneeId")
-    @Mapping(target = "labels",
+    /*@Mapping(target = "labels",
             expression = "java(dto.getLabelIds().stream()"
-                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).collect(getCollectors().toSet()))")
+                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).collect(getCollectors().toSet()))")*/
+    @Mapping(target = "labels", source = "labelIds")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(target = "status", source = "taskStatus.slug")
