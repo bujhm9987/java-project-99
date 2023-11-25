@@ -25,7 +25,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-public class Task implements BaseEntity {
+public final class Task implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
