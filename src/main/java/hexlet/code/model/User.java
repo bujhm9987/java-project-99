@@ -1,6 +1,5 @@
 package hexlet.code.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -56,7 +55,7 @@ public class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "assignee", fetch = FetchType.EAGER)
     private List<Task> tasks;
 
     @Override
