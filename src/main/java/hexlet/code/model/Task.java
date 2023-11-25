@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -25,7 +26,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-public final class Task implements BaseEntity {
+public class Task implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -45,7 +46,7 @@ public final class Task implements BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private User assignee;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<Label> labels;
 
     @CreatedDate

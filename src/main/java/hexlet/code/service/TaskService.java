@@ -64,7 +64,7 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        var taskLabelIds = taskData.getLabelIds();
+        var taskLabelIds = taskData.getTaskLabelIds();
         if (taskLabelIds != null) {
             var newLabels = taskLabelIds.stream()
                     .map(i -> labelRepository.findById(i)
