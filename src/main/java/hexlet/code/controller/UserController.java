@@ -104,7 +104,7 @@ public final class UserController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> showUser(@PathVariable long id) {
+    public ResponseEntity<UserDTO> showUser(@PathVariable Long id) {
         return ResponseEntity.ok()
                 .body(userService.findById(id));
     }
@@ -134,7 +134,7 @@ public final class UserController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> updateUser(@PathVariable long id, @RequestBody @Valid UserUpdateDTO userData) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO userData) {
         return ResponseEntity.ok()
                 .body(userService.update(userData, id));
     }
@@ -155,7 +155,7 @@ public final class UserController {
     )
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable long id) {
+    public void deleteUser(@PathVariable Long id) {
         userService.delete(id);
     }
 }

@@ -106,7 +106,7 @@ public final class LabelController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<LabelDTO> showLabel(@PathVariable long id) {
+    public ResponseEntity<LabelDTO> showLabel(@PathVariable Long id) {
         return ResponseEntity.ok()
                 .body(labelService.findById(id));
     }
@@ -134,7 +134,7 @@ public final class LabelController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<LabelDTO> updateLabel(@PathVariable long id,
+    public ResponseEntity<LabelDTO> updateLabel(@PathVariable Long id,
                                               @RequestBody @Valid LabelUpdateDTO labelData) {
         return ResponseEntity.ok()
                 .body(labelService.update(labelData, id));
@@ -156,7 +156,7 @@ public final class LabelController {
     )
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLabel(@PathVariable long id) {
+    public void deleteLabel(@PathVariable Long id) {
         labelService.delete(id);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class UserDTO {
-    private long id;
+    private Long id;
     private JsonNullable<String> firstName;
     private JsonNullable<String> lastName;
     private JsonNullable<String> email;

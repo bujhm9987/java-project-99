@@ -103,7 +103,7 @@ public final class TaskStatusController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskStatusDTO> showTaskStatus(@PathVariable long id) {
+    public ResponseEntity<TaskStatusDTO> showTaskStatus(@PathVariable Long id) {
         return ResponseEntity.ok()
                 .body(taskStatusService.findById(id));
     }
@@ -131,7 +131,7 @@ public final class TaskStatusController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskStatusDTO> updateTaskStatus(@PathVariable long id,
+    public ResponseEntity<TaskStatusDTO> updateTaskStatus(@PathVariable Long id,
                                                           @RequestBody @Valid TaskStatusUpdateDTO taskStatusData) {
         return ResponseEntity.ok()
                 .body(taskStatusService.update(taskStatusData, id));
@@ -153,7 +153,7 @@ public final class TaskStatusController {
     )
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTaskStatus(@PathVariable long id) {
+    public void deleteTaskStatus(@PathVariable Long id) {
         taskStatusService.delete(id);
     }
 }
