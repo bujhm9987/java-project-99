@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 public class TaskDTO {
     private Long id;
+
     private JsonNullable<Integer> index;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
