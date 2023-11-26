@@ -97,12 +97,6 @@ public class UserService implements UserDetailsManager {
         } else {
             throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
         }
-        /*var userTasks = user.getTasks();
-        if (userTasks.isEmpty()) {
-            userRepository.deleteById(id);
-        } else {
-            throw new ConstraintViolationException(String.format("User with id %s has active tasks", id));
-        }*/
     }
 
     @Override

@@ -24,18 +24,12 @@ import java.util.stream.Collectors;
 )
 public abstract class TaskMapper {
 
-    /*@Autowired
-    private LabelRepository labelRepository;*/
-
     private Collectors collectors;
 
     private JsonNullable jsonNullable;
 
     @Mapping(target = "taskStatus.slug", source = "status")
     @Mapping(target = "assignee", source = "assigneeId")
-    /*@Mapping(target = "labels",
-            expression = "java(dto.getLabelIds().stream()"
-                    + ".map(i -> getLabelRepository().findById(i).orElse(null)).collect(getCollectors().toSet()))")*/
     @Mapping(target = "labels", source = "taskLabelIds")
     public abstract Task map(TaskCreateDTO dto);
 

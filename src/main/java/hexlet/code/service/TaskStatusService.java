@@ -74,7 +74,6 @@ public class TaskStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
 
         var tasks = taskRepository.findByTaskStatusId(id);
-        /*var tasks = taskStatus.getTasks();*/
         if (tasks.isEmpty()) {
             taskStatusRepository.deleteById(id);
         } else {

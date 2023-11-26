@@ -24,7 +24,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class TaskStatus implements BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank
     @Column(unique = true)
@@ -36,7 +36,4 @@ public class TaskStatus implements BaseEntity {
 
     @CreatedDate
     private Date createdAt;
-
-    /*@OneToMany(mappedBy = "taskStatus", cascade = CascadeType.ALL)
-    private List<Task> tasks;*/
 }

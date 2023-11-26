@@ -26,7 +26,7 @@ public class Label implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
     @Column(unique = true)

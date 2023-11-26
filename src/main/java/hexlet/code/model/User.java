@@ -31,7 +31,7 @@ public class User implements UserDetails, BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private long id;
+    private Long id;
 
     private String firstName;
 
@@ -49,9 +49,6 @@ public class User implements UserDetails, BaseEntity {
 
     @LastModifiedDate
     private Date updatedAt;
-
-    /*@OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private List<Task> tasks;*/
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
