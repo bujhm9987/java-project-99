@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
-public class TaskController {
+@RequestMapping(TaskController.URL)
+@RequiredArgsConstructor
+public final class TaskController {
 
-    @Autowired
-    private TaskService taskService;
+    public static final String URL = "/api/tasks";
+
+    private final TaskService taskService;
 
     @SecurityRequirement(name = "JWT")
     @Operation(

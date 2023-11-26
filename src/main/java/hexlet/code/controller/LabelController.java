@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,11 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/labels")
-public class LabelController {
+@RequestMapping(LabelController.URL)
+@RequiredArgsConstructor
+public final class LabelController {
 
-    @Autowired
-    private LabelService labelService;
+    public static final String URL = "/api/labels";
+
+    private final LabelService labelService;
 
     @SecurityRequirement(name = "JWT")
     @Operation(

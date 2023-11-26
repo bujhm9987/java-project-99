@@ -188,9 +188,8 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTask.getTaskStatus().getSlug());
         assertThat(task.getAssignee().getId()).isEqualTo(testTask.getAssignee().getId());
-        //assertThat(task.getTaskLabels().).isEqualTo(testTask.getTaskLabels().stream()..getId());
-        //assertThat(task.getTaskLabels().get(1).getId()).isEqualTo(testTask.getTaskLabels().get(1).getId());
-        //assertThat(task.getTaskLabels()).isEqualTo(testTask.getTaskLabels());
+        assertThat(task.getLabels().stream().map(Label::getId).collect(Collectors.toSet()))
+                .isEqualTo(testTask.getLabels().stream().map(Label::getId).collect(Collectors.toSet()));
     }
 
     @Test
@@ -204,10 +203,10 @@ public class TaskControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
 
-        /*var task = taskRepository.findByName(
+        var task = taskRepository.findByName(
                 testTask.getName()).orElse(null);
 
-        assertThat(task).isNull();*/
+        assertThat(task).isNull();
     }
 
     @Test
@@ -310,7 +309,8 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(testTask.getDescription());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(newData.get("status"));
         assertThat(task.getAssignee().getId()).isEqualTo(newData.get("assignee_id"));
-        assertThat(task.getLabels().size()).isEqualTo(testTask.getLabels().size());
+        assertThat(task.getLabels().stream().map(Label::getId).collect(Collectors.toSet()))
+                .isEqualTo(testTask.getLabels().stream().map(Label::getId).collect(Collectors.toSet()));
     }
 
     @Test
@@ -451,7 +451,7 @@ public class TaskControllerTest {
     @Test
     public void testFilteringWithLabelId() throws Exception {
         taskRepository.save(testTask);
-        var testLabelId = "1"; //testTask.getTaskLabels().get(0).getId();
+        var testLabelId = testTask.getLabels().stream().map(Label::getId).findFirst().orElse(1L);
         var result = mockMvc.perform(get(url + "?labelId=" + testLabelId).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -459,7 +459,7 @@ public class TaskControllerTest {
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray().allSatisfy(element ->
                 assertThatJson(element)
-                        .and(v -> v.node("labelIds").isArray().contains(testLabelId)));
+                        .and(v -> v.node("taskLabelIds").isArray().contains(testLabelId)));
     }
 
     @Test
@@ -468,7 +468,8 @@ public class TaskControllerTest {
         var testTaskTitle = testTask.getName();
         var testTaskAssigneeId = testTask.getAssignee().getId();
         var testTaskStatusSlug = testTask.getTaskStatus().getSlug();
-        var testLabelId = "1"; //testTask.getTaskLabels().get(0).getId();
+        var testLabelId = testTask.getLabels().stream().map(Label::getId).findFirst().orElse(1L);
+
         var result = mockMvc.perform(get(url + "?titleCont=" + testTaskTitle + "&assigneeId="
                         + testTaskAssigneeId + "&status=" + testTaskStatusSlug + "&labelId=" + testLabelId)
                         .with(token))
@@ -486,6 +487,6 @@ public class TaskControllerTest {
                         .and(v -> v.node("status").asString().containsIgnoringCase(testTaskStatusSlug)));
         assertThatJson(body).isArray().allSatisfy(element ->
                 assertThatJson(element)
-                        .and(v -> v.node("labelIds").isArray().contains(testLabelId)));
+                        .and(v -> v.node("taskLabelIds").isArray().contains(testLabelId)));
     }
 }

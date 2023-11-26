@@ -27,12 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(UserController.BASE_URL + UserController.PATH)
+@RequestMapping(UserController.URL)
 @RequiredArgsConstructor
 public final class UserController {
 
-    public static final String BASE_URL = "${base-url}";
-    public static final String PATH = "/users";
+    public static final String URL = "/api/users";
 
     private final UserService userService;
 

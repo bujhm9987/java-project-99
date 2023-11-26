@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/login")
-public class AuthenticationController {
+@RequestMapping(AuthenticationController.URL)
+public final class AuthenticationController {
+
+    public static final String URL = "/api/login";
 
     private final JWTUtils jwtUtils;
 

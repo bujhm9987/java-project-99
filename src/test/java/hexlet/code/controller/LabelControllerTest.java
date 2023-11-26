@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -115,7 +114,6 @@ public class LabelControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        var dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         assertThatJson(body).and(
                 v -> v.node("name").isEqualTo(testLabel.getName())
         );

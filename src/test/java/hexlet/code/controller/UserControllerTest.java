@@ -370,5 +370,4 @@ class UserControllerTest {
 
         assertThat(delUser).isNotNull();
     }
-
 }
