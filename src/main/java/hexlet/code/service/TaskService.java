@@ -15,6 +15,7 @@ import hexlet.code.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,20 @@ public class TaskService {
     }
 
     public TaskDTO create(TaskCreateDTO taskData) {
+
+        var taskLabelIDs = taskData.getTaskLabelIds();
+        if (taskLabelIDs != null) {
+            var labelIds = taskLabelIDs.stream()
+                    .map(i -> labelRepository.findById(i)
+                            .orElseThrow(() -> new ConstraintViolationException(String
+                                    .format("Label with id %s not found", i)))
+                            .getId())
+                    .collect(Collectors.toSet());
+            taskData.setTaskLabelIds(labelIds);
+        } else {
+            taskData.setTaskLabelIds(new HashSet<>());
+        }
+
         var task = taskMapper.map(taskData);
 
         var taskStatusSlug = taskData.getStatus();
@@ -62,16 +77,6 @@ public class TaskService {
                     .orElseThrow(() -> new ConstraintViolationException(String
                             .format("User with id %s not found", taskDataUserId)));
             task.setAssignee(assignee);
-        }
-
-        var taskLabelIds = taskData.getTaskLabelIds();
-        if (taskLabelIds != null) {
-            var newLabels = taskLabelIds.stream()
-                    .map(i -> labelRepository.findById(i)
-                            .orElseThrow(() -> new ConstraintViolationException(String
-                                    .format("Label with id %s not found", i))))
-                    .collect(Collectors.toSet());
-            task.setLabels(newLabels);
         }
 
         taskRepository.save(task);
