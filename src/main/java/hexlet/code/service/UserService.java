@@ -73,7 +73,7 @@ public class UserService implements UserDetailsManager {
         var userDataEmail = userData.getEmail();
         if (userDataEmail != null) {
             var findUser = userRepository.findByEmail(userDataEmail.get());
-            if (findUser.isPresent()) {
+            if (findUser.isPresent() && id != user.getId()) {
                 throw new ConstraintViolationException(
                         String.format("User with email %s already exists", userDataEmail.get()));
             }
