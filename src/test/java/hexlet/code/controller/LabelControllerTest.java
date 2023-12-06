@@ -140,9 +140,6 @@ public class LabelControllerTest {
         newTestLabel.setName(testLabel.getName());
         var dto = mapper.mapToCreateDTO(newTestLabel);
 
-        /*testLabel.setName(testLabel.getName());
-        var dto = mapper.mapToCreateDTO(testLabel);*/
-
         var request = post(url).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
@@ -184,20 +181,6 @@ public class LabelControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
     }
-
-    /*@Test
-    public void testUpdateLabelWhitAlreadyExistName() throws Exception {
-        var newTestLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-        newTestLabel.setName(testLabel.getName());
-        var dto = mapper.mapToCreateDTO(newTestLabel);
-
-        var request = put(url + "/{id}", testLabel.getId()).with(jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-    }*/
 
     @Test
     public void testDestroyLabel() throws Exception {

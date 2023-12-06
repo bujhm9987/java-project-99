@@ -68,15 +68,9 @@ public class UserService implements UserDetailsManager {
     }
 
     public void delete(Long id) {
-
         userRepository.findById(id)
                 .orElseThrow();
-        /*var userTasks = taskRepository.findByAssigneeId(userUtils.getCurrentUser().getId());
-        if (userTasks.isEmpty()) {*/
         userRepository.deleteById(id);
-        /*} else {
-            throw new ChangeSetPersister.NotFoundException();
-        }*/
     }
 
     @Override

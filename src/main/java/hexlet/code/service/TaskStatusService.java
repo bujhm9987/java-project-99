@@ -55,11 +55,5 @@ public class TaskStatusService {
         taskStatusRepository.findById(id)
                 .orElseThrow();
         taskStatusRepository.deleteById(id);
-        /*var tasks = taskRepository.findByTaskStatusId(id);
-        if (tasks.isEmpty()) {
-            taskStatusRepository.deleteById(id);
-        } else {
-            throw new ConstraintViolationException(String.format("TaskStatus with id %s is user in tasks", id));
-        }*/
     }
 }

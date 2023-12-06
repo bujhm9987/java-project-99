@@ -31,11 +31,6 @@ public class LabelService {
     }
 
     public LabelDTO create(LabelCreateDTO labelData) {
-        /*var labelName = labelData.getName();
-        var findName = labelRepository.findByName(labelName);
-        if (findName.isPresent()) {
-            throw new ConstraintViolationException(String.format("Label with name %s already exists", labelName));
-        }*/
         var label = labelMapper.map(labelData);
         labelRepository.save(label);
         return labelMapper.map(label);
@@ -48,16 +43,9 @@ public class LabelService {
     }
 
     public LabelDTO update(LabelUpdateDTO labelData, Long id) {
-        /*var label = labelRepository.findById(id)
-                .orElseThrow();*/
-        /*var labelName = labelData.getName();
-        var findName = labelRepository.findByName(labelName.get());
-        if (findName.isPresent()) {
-            throw new ConstraintViolationException(String.format("Label with name %s already exists", labelName.get()));
-        }*/
+
         var label = labelRepository.findById(id)
                 .orElseThrow();
-
 
         labelMapper.update(labelData, label);
         labelRepository.save(label);
@@ -68,17 +56,5 @@ public class LabelService {
         labelRepository.findById(id)
                 .orElseThrow();
         labelRepository.deleteById(id);
-        /*var tasks = taskRepository.findAll();
-
-        var findTask = tasks.stream()
-                .flatMap(task -> task.getLabels().stream())
-                .map(Label::getId)
-                .filter(id::equals)
-                .findAny();
-        if (findTask.isEmpty()) {
-            labelRepository.deleteById(id);
-        } else {
-            throw new ConstraintViolationException(String.format("Label with id %s has active tasks", id));
-        }*/
     }
 }
