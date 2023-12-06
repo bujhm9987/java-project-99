@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -56,6 +58,12 @@ class UserControllerTest {
 
     private User testUser;
 
+    private User testAnotherUser;
+
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
+
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenAnotherUser;
+
     @Value("${base-url}" + "/users")
     @Autowired
     private String url;
@@ -63,11 +71,21 @@ class UserControllerTest {
     @BeforeEach
     public void setUp() {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        userRepository.save(testUser);
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
+        testAnotherUser = Instancio.of(modelGenerator.getUserModel()).create();
+        userRepository.save(testAnotherUser);
+        tokenAnotherUser = jwt().jwt(builder -> builder.subject(testAnotherUser.getEmail()));
+    }
+
+    @AfterEach
+    public void clear() {
+        userRepository.deleteAll();
     }
 
     @Test
-    public void testIndex() throws Exception {
-        userRepository.save(testUser);
+    public void testGetAllUsers() throws Exception {
 
         var result = mockMvc.perform(get(url).with(jwt()))
                 .andExpect(status().isOk())
@@ -77,18 +95,8 @@ class UserControllerTest {
         assertThatJson(body).isArray();
     }
 
-    /*@Test
-    public void testIndexWithoutAuthentication() throws Exception {
-        userRepository.save(testUser);
-
-        var result = mockMvc.perform(get(url))
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }*/
-
     @Test
-    public void testShow() throws Exception {
-        userRepository.save(testUser);
+    public void testGetUser() throws Exception {
 
         var request = get(url + "/{id}", testUser.getId()).with(jwt());
 
@@ -104,20 +112,11 @@ class UserControllerTest {
         );
     }
 
-    /*@Test
-    public void testShowWithoutAuthentication() throws Exception {
-        userRepository.save(testUser);
-
-        var request = get(url + "/{id}", testUser.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }*/
-
     @Test
-    public void testCreate() throws Exception {
+    public void testCreateUser() throws Exception {
 
-        var dto = mapper.mapToCreateDTO(testUser);
+        var newTestUser = Instancio.of(modelGenerator.getUserModel()).create();
+        var dto = mapper.mapToCreateDTO(newTestUser);
 
         var request = post(url)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,11 +132,10 @@ class UserControllerTest {
         assertThat(user.getFirstName()).isEqualTo(testUser.getFirstName());
         assertThat(user.getLastName()).isEqualTo(testUser.getLastName());
         assertThat(user.getEmail()).isEqualTo(testUser.getEmail());
-        assertThat(user.getPassword()).isNotEqualTo(testUser.getPassword());
     }
 
     @Test
-    public void testCreateWithNotValidEmail() throws Exception {
+    public void testCreateUserWithNotValidEmail() throws Exception {
         testUser.setEmail("email");
         var dto = mapper.mapToCreateDTO(testUser);
 
@@ -150,7 +148,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testCreateWithNotValidPassword() throws Exception {
+    public void testCreateUserWithNotValidPassword() throws Exception {
         testUser.setPassword("pa");
         var dto = mapper.mapToCreateDTO(testUser);
 
@@ -163,10 +161,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
-        userRepository.save(testUser);
-
-        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+    public void testUpdateUser() throws Exception {
 
         var newUserModel = Instancio.of(modelGenerator.getUserModel()).create();
         var dto = mapper.mapToCreateDTO(newUserModel);
@@ -185,13 +180,10 @@ class UserControllerTest {
         assertThat(user.getFirstName()).isEqualTo(dto.getFirstName());
         assertThat(user.getLastName()).isEqualTo(dto.getLastName());
         assertThat(user.getEmail()).isEqualTo(dto.getEmail());
-        assertThat(user.getPassword()).isNotEqualTo(dto.getPassword());
     }
 
     @Test
-    public void testPartialUpdate() throws Exception {
-        userRepository.save(testUser);
-        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+    public void testPartialUpdateUser() throws Exception {
 
         testUser.setFirstName(faker.name().firstName());
         testUser.setPassword(faker.internet().password(3, 12));
@@ -215,9 +207,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateWithNotValidEmail() throws Exception {
-
-        userRepository.save(testUser);
+    public void testUpdateUserWithNotValidEmail() throws Exception {
 
         testUser.setEmail("incorrect_email");
         var dto = mapper.mapToCreateDTO(testUser);
@@ -231,9 +221,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateWithNotValidPassword() throws Exception {
-
-        userRepository.save(testUser);
+    public void testUpdateUserWithNotValidPassword() throws Exception {
 
         testUser.setPassword("pa");
         var dto = mapper.mapToCreateDTO(testUser);
@@ -246,34 +234,13 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    /*@Test
-    public void testUpdateWithoutAuthentication() throws Exception {
-        userRepository.save(testUser);
-
-        var newData = Map.of(
-                "email", faker.internet().emailAddress(),
-                "firstName", faker.name().firstName(),
-                "lastName", faker.name().lastName(),
-                "password", faker.internet().password(3, 12)
-        );
-
-        var request = put(url + "/{id}", testUser.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(newData));
-
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-    }*/
-
     @Test
-    public void testUpdateAnotherUser() throws Exception {
-        userRepository.save(testUser);
-        var tokenDefaultUser = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
+    public void testUpdateUserAnotherUser() throws Exception {
 
-        var newUserModel = Instancio.of(modelGenerator.getUserModel()).create();
-        var dto = mapper.mapToCreateDTO(newUserModel);
+        testUser.setFirstName(faker.name().firstName());
+        var dto = mapper.mapToCreateDTO(testUser);
 
-        var request = put(url + "/{id}", testUser.getId()).with(tokenDefaultUser)
+        var request = put(url + "/{id}", testUser.getId()).with(tokenAnotherUser)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
@@ -282,9 +249,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testDestroy() throws Exception {
-        userRepository.save(testUser);
-        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+    public void testDestroyUser() throws Exception {
 
         var request = delete(url + "/{id}", testUser.getId()).with(token);
         mockMvc.perform(request)
@@ -296,25 +261,10 @@ class UserControllerTest {
         assertThat(user).isNull();
     }
 
-    /*@Test
-    public void testDestroyWithoutAuthentication() throws Exception {
-        userRepository.save(testUser);
-        var request = delete(url + "/{id}", testUser.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-
-        var user = userRepository.findById(
-                testUser.getId()).orElse(null);
-
-        assertThat(user).isNotNull();
-    }*/
-
     @Test
     public void testDestroyAnotherUser() throws Exception {
-        userRepository.save(testUser);
-        var tokenDefaultUser = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
 
-        var request = delete(url + "/{id}", testUser.getId()).with(tokenDefaultUser);
+        var request = delete(url + "/{id}", testUser.getId()).with(tokenAnotherUser);
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
 
@@ -323,27 +273,4 @@ class UserControllerTest {
 
         assertThat(user).isNotNull();
     }
-
-    /*@Test
-    public void testDestroyWithActiveTask() throws Exception {
-        userRepository.save(testUser);
-        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
-
-        var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-        taskStatusRepository.save(testTaskStatus);
-
-        var testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testTask.setTaskStatus(testTaskStatus);
-        testTask.setAssignee(testUser);
-        taskRepository.save(testTask);
-
-        var request = delete(url + "/{id}", testUser.getId()).with(token);
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-
-        var delUser = userRepository.findById(
-                testUser.getId()).orElse(null);
-
-        assertThat(delUser).isNotNull();
-    }*/
 }

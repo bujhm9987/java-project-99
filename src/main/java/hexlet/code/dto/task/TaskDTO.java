@@ -1,4 +1,4 @@
-package hexlet.code.dto;
+package hexlet.code.dto.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,11 +1,9 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskParamsDTO;
-import hexlet.code.dto.TaskUpdateDTO;
-import hexlet.code.exception.ConstraintViolationException;
-import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
+import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
@@ -54,8 +52,7 @@ public class TaskService {
         if (taskLabelIDs != null) {
             var labelIds = taskLabelIDs.stream()
                     .map(i -> labelRepository.findById(i)
-                            .orElseThrow(() -> new ConstraintViolationException(String
-                                    .format("Label with id %s not found", i)))
+                            .orElseThrow()
                             .getId())
                     .collect(Collectors.toSet());
             taskData.setTaskLabelIds(labelIds);
@@ -67,15 +64,13 @@ public class TaskService {
 
         var taskStatusSlug = taskData.getStatus();
         var taskStatus = taskStatusRepository.findBySlug(taskStatusSlug)
-                .orElseThrow(() -> new ConstraintViolationException(String
-                        .format("Status with slug %s not found", taskStatusSlug)));
+                .orElseThrow();
         task.setTaskStatus(taskStatus);
 
         var taskDataUserId = taskData.getAssigneeId();
         if (taskDataUserId != 0) {
             var assignee = userRepository.findById(taskDataUserId)
-                    .orElseThrow(() -> new ConstraintViolationException(String
-                            .format("User with id %s not found", taskDataUserId)));
+                    .orElseThrow();
             task.setAssignee(assignee);
         }
 
@@ -85,29 +80,27 @@ public class TaskService {
 
     public TaskDTO findById(Long id) {
         var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with id %s not found", id)));
+                .orElseThrow();
         return taskMapper.map(task);
     }
 
     public TaskDTO update(TaskUpdateDTO taskData, Long id) {
         var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with id %s not found", id)));
+                .orElseThrow();
 
         taskMapper.update(taskData, task);
 
         var taskDataSlug = taskData.getStatus();
         if (taskDataSlug != null) {
             var status = taskStatusRepository.findBySlug((taskDataSlug).get())
-                    .orElseThrow(() -> new ConstraintViolationException(String
-                            .format("Status with slug %s not found", taskDataSlug.get())));
+                    .orElseThrow();
             task.setTaskStatus(status);
         }
 
         var taskDataUserId = taskData.getAssigneeId();
         if (taskDataUserId != null) {
             var assignee = userRepository.findById((taskDataUserId).get())
-                    .orElseThrow(() -> new ConstraintViolationException(String
-                            .format("User with id %s not found", taskDataUserId.get())));
+                    .orElseThrow();
             task.setAssignee(assignee);
         }
 
@@ -115,8 +108,7 @@ public class TaskService {
         if (taskLabelIds != null) {
             var newLabels = taskLabelIds.get().stream()
                     .map(i -> labelRepository.findById(i)
-                            .orElseThrow(() -> new ConstraintViolationException(String
-                                    .format("Label with id %s not found", i))))
+                            .orElseThrow())
                     .collect(Collectors.toSet());
             task.setLabels(newLabels);
         }
@@ -127,7 +119,7 @@ public class TaskService {
 
     public void delete(Long id) {
         taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with id %s not found", id)));
+                .orElseThrow();
         taskRepository.deleteById(id);
     }
 }

@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,12 +65,16 @@ class TaskStatusControllerTest {
     @BeforeEach
     public void setUp() {
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(testTaskStatus);
+    }
+
+    @AfterEach
+    public void clear() {
+        taskStatusRepository.deleteAll();
     }
 
     @Test
-    public void testIndex() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testGetALLTaskStatuses() throws Exception {
 
         var result = mockMvc.perform(get(url).with(jwt()))
                 .andExpect(status().isOk())
@@ -80,9 +85,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testAllTaskStatus() throws Exception {
 
         var request = get(url + "/{id}", testTaskStatus.getId()).with(jwt());
         var result = mockMvc.perform(request)
@@ -97,9 +100,9 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testCreate() throws Exception {
-
-        var dto = mapper.mapToCreateDTO(testTaskStatus);
+    public void testCreateTaskStatus() throws Exception {
+        var newTaskStatusModel = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        var dto = mapper.mapToCreateDTO(newTaskStatusModel);
 
         var request = post(url).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -116,21 +119,8 @@ class TaskStatusControllerTest {
         assertThat(taskStatus.getSlug()).isEqualTo(testTaskStatus.getSlug());
     }
 
-    /*@Test
-    public void testCreateWithoutAuthentication() throws Exception {
-
-        var dto = mapper.mapToCreateDTO(testTaskStatus);
-
-        var request = post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-    }*/
-
     @Test
-    public void testCreateWithNotValidName() throws Exception {
+    public void testCreateTaskStatusWithNotValidName() throws Exception {
         testTaskStatus.setName("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
@@ -143,7 +133,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testCreateWithNotValidSlug() throws Exception {
+    public void testCreateTaskStatusWithNotValidSlug() throws Exception {
         testTaskStatus.setSlug("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
 
@@ -156,8 +146,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
-        taskStatusRepository.save(testTaskStatus);
+    public void testUpdateTaskStatus() throws Exception {
 
         var newTaskStatusModel = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         var dto = mapper.mapToCreateDTO(newTaskStatusModel);
@@ -178,9 +167,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testPartialUpdate() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testPartialUpdateTaskStatus() throws Exception {
 
         testTaskStatus.setSlug(faker.internet().slug());
         var dto = mapper.mapToCreateDTO(testTaskStatus);
@@ -201,9 +188,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testUpdateWithNotValidName() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testUpdateTaskStatusWithNotValidName() throws Exception {
 
         testTaskStatus.setName("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
@@ -217,9 +202,7 @@ class TaskStatusControllerTest {
     }
 
     @Test
-    public void testUpdateWithNotValidSlug() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testUpdateTaskStatusWithNotValidSlug() throws Exception {
 
         testTaskStatus.setSlug("");
         var dto = mapper.mapToCreateDTO(testTaskStatus);
@@ -232,27 +215,8 @@ class TaskStatusControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    /*@Test
-    public void testUpdateWithoutAuthentication() throws Exception {
-        taskStatusRepository.save(testTaskStatus);
-
-        var newData = Map.of(
-                "name", faker.name().name(),
-                "slug", faker.internet().slug()
-        );
-
-        var request = put(url + "/{id}", testTaskStatus.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(newData));
-
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-    }*/
-
     @Test
-    public void testDestroy() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
+    public void testDestroyTaskStatus() throws Exception {
 
         var request = delete(url + "/{id}", testTaskStatus.getId()).with(jwt());
         mockMvc.perform(request)
@@ -263,40 +227,4 @@ class TaskStatusControllerTest {
 
         assertThat(taskStatus).isNull();
     }
-
-    /*@Test
-    public void testDestroyWithoutAuthentication() throws Exception {
-
-        taskStatusRepository.save(testTaskStatus);
-
-        var request = delete(url + "/{id}", testTaskStatus.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-
-        var taskStatus = taskStatusRepository.findById(
-                testTaskStatus.getId()).orElse(null);
-
-        assertThat(taskStatus).isNotNull();
-    }*/
-
-    /*@Test
-    public void testDestroyWithActiveTask() throws Exception {
-        taskStatusRepository.save(testTaskStatus);
-        var testUser = Instancio.of(modelGenerator.getUserModel()).create();
-        userRepository.save(testUser);
-
-        var testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testTask.setTaskStatus(testTaskStatus);
-        testTask.setAssignee(testUser);
-        taskRepository.save(testTask);
-
-        var request = delete(url + "/{id}", testTaskStatus.getId()).with(jwt());
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-
-        var taskStatus = taskStatusRepository.findById(
-                testTaskStatus.getId()).orElse(null);
-
-        assertThat(taskStatus).isNotNull();
-    }*/
 }

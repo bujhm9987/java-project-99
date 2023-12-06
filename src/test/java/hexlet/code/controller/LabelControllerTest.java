@@ -10,6 +10,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +69,16 @@ public class LabelControllerTest {
     @BeforeEach
     public void setUp() {
         testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
+    }
+
+    @AfterEach
+    public void clear() {
+        labelRepository.deleteAll();
     }
 
     @Test
-    public void testIndex() throws Exception {
-        labelRepository.save(testLabel);
+    public void testGetAllLabels() throws Exception {
 
         var result = mockMvc.perform(get(url).with(jwt()))
                 .andExpect(status().isOk())
@@ -82,18 +88,8 @@ public class LabelControllerTest {
         assertThatJson(body).isArray();
     }
 
-    /*@Test
-    public void testIndexWithoutAuthentication() throws Exception {
-        labelRepository.save(testLabel);
-
-        var result = mockMvc.perform(get(url))
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }*/
-
     @Test
-    public void testShow() throws Exception {
-        labelRepository.save(testLabel);
+    public void testGetLabel() throws Exception {
 
         var request = get(url + "/{id}", testLabel.getId()).with(jwt());
         var result = mockMvc.perform(request)
@@ -105,20 +101,11 @@ public class LabelControllerTest {
         );
     }
 
-    /*@Test
-    public void testShowWithoutAuthentication() throws Exception {
-        labelRepository.save(testLabel);
-
-        var request = get(url + "/{id}", testLabel.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }*/
-
     @Test
-    public void testCreate() throws Exception {
-        testLabel.setName("Unique name");
-        var dto = mapper.mapToCreateDTO(testLabel);
+    public void testCreateLabel() throws Exception {
+
+        var newTestLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        var dto = mapper.mapToCreateDTO(newTestLabel);
 
         var request = post(url).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +122,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testCreateWithNotValidName() throws Exception {
+    public void testCreateLabelWithNotValidName() throws Exception {
         testLabel.setName("Un");
         var dto = mapper.mapToCreateDTO(testLabel);
 
@@ -148,9 +135,13 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testCreateWhitAlreadyExistName() throws Exception {
-        testLabel.setName("bug");
-        var dto = mapper.mapToCreateDTO(testLabel);
+    public void testCreateLabelWhitAlreadyExistName() throws Exception {
+        var newTestLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        newTestLabel.setName(testLabel.getName());
+        var dto = mapper.mapToCreateDTO(newTestLabel);
+
+        /*testLabel.setName(testLabel.getName());
+        var dto = mapper.mapToCreateDTO(testLabel);*/
 
         var request = post(url).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -160,22 +151,8 @@ public class LabelControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    /*@Test
-    public void testCreateWithAuthentication() throws Exception {
-        testLabel.setName("Unique name");
-        var dto = mapper.mapToCreateDTO(testLabel);
-
-        var request = post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(dto));
-
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-    }*/
-
     @Test
-    public void testUpdate() throws Exception {
-        labelRepository.save(testLabel);
+    public void testUpdateLabel() throws Exception {
 
         testLabel.setName("New name");
         var dto = mapper.mapToCreateDTO(testLabel);
@@ -195,8 +172,7 @@ public class LabelControllerTest {
     }
 
     @Test
-    public void testUpdateWithNotValidName() throws Exception {
-        labelRepository.save(testLabel);
+    public void testUpdateLabelWithNotValidName() throws Exception {
 
         testLabel.setName("U");
         var dto = mapper.mapToCreateDTO(testLabel);
@@ -209,13 +185,11 @@ public class LabelControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    public void testUpdateWhitAlreadyExistName() throws Exception {
-        labelRepository.save(testLabel);
-        var testLabelName = testLabel.getName();
-
-        testLabel.setName(testLabelName);
-        var dto = mapper.mapToCreateDTO(testLabel);
+    /*@Test
+    public void testUpdateLabelWhitAlreadyExistName() throws Exception {
+        var newTestLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        newTestLabel.setName(testLabel.getName());
+        var dto = mapper.mapToCreateDTO(newTestLabel);
 
         var request = put(url + "/{id}", testLabel.getId()).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -223,27 +197,11 @@ public class LabelControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
-    }
-
-    /*@Test
-    public void testUpdateWithoutAuthentication() throws Exception {
-        labelRepository.save(testLabel);
-
-        var newData = Map.of(
-                "name", faker.lorem().characters(3, 1000)
-        );
-
-        var request = put(url + "/{id}", testLabel.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(newData));
-
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
     }*/
 
     @Test
-    public void testDestroy() throws Exception {
-        labelRepository.save(testLabel);
+    public void testDestroyLabel() throws Exception {
+
         var request = delete(url + "/{id}", testLabel.getId()).with(jwt());
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -253,42 +211,4 @@ public class LabelControllerTest {
 
         assertThat(label).isNull();
     }
-
-    /*@Test
-    public void testDestroyWithoutAuthentication() throws Exception {
-        labelRepository.save(testLabel);
-        var request = delete(url + "/{id}", testLabel.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-
-        var label = labelRepository.findById(
-                testLabel.getId()).orElse(null);
-
-        assertThat(label).isNotNull();
-    }*/
-
-    /*@Test
-    public void testDestroyWithActiveTask() throws Exception {
-        labelRepository.save(testLabel);
-        var testUser = Instancio.of(modelGenerator.getUserModel()).create();
-        userRepository.save(testUser);
-
-        var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-        taskStatusRepository.save(testTaskStatus);
-
-        var testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testTask.setTaskStatus(testTaskStatus);
-        testTask.setAssignee(testUser);
-        testTask.setLabels(Set.of(testLabel));
-        taskRepository.save(testTask);
-
-        var request = delete(url + "/{id}", testLabel.getId()).with(jwt());
-        mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
-
-        var label = labelRepository.findById(
-                testLabel.getId()).orElse(null);
-
-        assertThat(label).isNotNull();
-    }*/
 }

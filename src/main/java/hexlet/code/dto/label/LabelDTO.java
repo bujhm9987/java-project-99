@@ -1,4 +1,4 @@
-package hexlet.code.dto;
+package hexlet.code.dto.label;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -9,11 +9,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class UserDTO {
+public class LabelDTO {
     private long id;
-    private JsonNullable<String> firstName;
-    private JsonNullable<String> lastName;
-    private JsonNullable<String> email;
+    private JsonNullable<String> name;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date createdAt;
 }

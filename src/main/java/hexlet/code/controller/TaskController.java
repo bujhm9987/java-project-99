@@ -1,9 +1,9 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskParamsDTO;
-import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
+import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,7 +55,7 @@ public final class TaskController {
     )
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<TaskDTO>> getTasks(@Parameter(description = "Filtering parameters for task list")
+    public ResponseEntity<List<TaskDTO>> getAllTasks(@Parameter(description = "Filtering parameters for task list")
                                                       TaskParamsDTO paramsDTO) {
         var tasks = taskService.getAll(paramsDTO);
         return ResponseEntity.ok()
@@ -108,9 +108,8 @@ public final class TaskController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskDTO> showTask(@PathVariable long id) {
-        return ResponseEntity.ok()
-                .body(taskService.findById(id));
+    public TaskDTO getTask(@PathVariable long id) {
+        return taskService.findById(id);
     }
 
     @SecurityRequirement(name = "JWT")
@@ -136,10 +135,9 @@ public final class TaskController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable long id,
+    public TaskDTO updateTask(@PathVariable long id,
                                                     @RequestBody @Valid TaskUpdateDTO taskData) {
-        return ResponseEntity.ok()
-                .body(taskService.update(taskData, id));
+        return taskService.update(taskData, id);
     }
 
     @SecurityRequirement(name = "JWT")

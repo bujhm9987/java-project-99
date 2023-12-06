@@ -1,8 +1,8 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.TaskStatusCreateDTO;
-import hexlet.code.dto.TaskStatusDTO;
-import hexlet.code.dto.TaskStatusUpdateDTO;
+import hexlet.code.dto.taskStatus.TaskStatusCreateDTO;
+import hexlet.code.dto.taskStatus.TaskStatusDTO;
+import hexlet.code.dto.taskStatus.TaskStatusUpdateDTO;
 import hexlet.code.service.TaskStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -52,7 +52,7 @@ public final class TaskStatusController {
     )
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<TaskStatusDTO>> getTaskStatuses() {
+    public ResponseEntity<List<TaskStatusDTO>> getAllTaskStatuses() {
         var taskStatuses = taskStatusService.getAll();
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(taskStatuses.size()))
@@ -103,9 +103,8 @@ public final class TaskStatusController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskStatusDTO> showTaskStatus(@PathVariable long id) {
-        return ResponseEntity.ok()
-                .body(taskStatusService.findById(id));
+    public TaskStatusDTO getTaskStatus(@PathVariable long id) {
+        return taskStatusService.findById(id);
     }
 
     @SecurityRequirement(name = "JWT")
@@ -131,10 +130,9 @@ public final class TaskStatusController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TaskStatusDTO> updateTaskStatus(@PathVariable long id,
+    public TaskStatusDTO updateTaskStatus(@PathVariable long id,
                                                           @RequestBody @Valid TaskStatusUpdateDTO taskStatusData) {
-        return ResponseEntity.ok()
-                .body(taskStatusService.update(taskStatusData, id));
+        return taskStatusService.update(taskStatusData, id);
     }
 
     @SecurityRequirement(name = "JWT")

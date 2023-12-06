@@ -20,9 +20,4 @@ public class UserUtils {
         var email = authentication.getName();
         return userRepository.findByEmail(email).get();
     }
-
-    public User getTestUser() {
-        return userRepository.findByEmail("hexlet@example.com")
-                .orElseThrow(() -> new RuntimeException("User doesn't exist"));
-    }
 }

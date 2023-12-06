@@ -1,9 +1,9 @@
 package hexlet.code.controller;
 
 
-import hexlet.code.dto.LabelCreateDTO;
-import hexlet.code.dto.LabelDTO;
-import hexlet.code.dto.LabelUpdateDTO;
+import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.service.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -54,7 +54,7 @@ public final class LabelController {
     )
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<LabelDTO>> getLabels() {
+    public ResponseEntity<List<LabelDTO>> getAllLabels() {
         var labels = labelService.getAll();
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(labels.size()))
@@ -106,9 +106,8 @@ public final class LabelController {
     )
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<LabelDTO> showLabel(@PathVariable long id) {
-        return ResponseEntity.ok()
-                .body(labelService.findById(id));
+    public LabelDTO getLabel(@PathVariable long id) {
+        return labelService.findById(id);
     }
 
     @SecurityRequirement(name = "JWT")
@@ -134,10 +133,9 @@ public final class LabelController {
     )
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<LabelDTO> updateLabel(@PathVariable long id,
+    public LabelDTO updateLabel(@PathVariable long id,
                                               @RequestBody @Valid LabelUpdateDTO labelData) {
-        return ResponseEntity.ok()
-                .body(labelService.update(labelData, id));
+        return labelService.update(labelData, id);
     }
 
     @SecurityRequirement(name = "JWT")
