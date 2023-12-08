@@ -85,10 +85,10 @@ public abstract class TaskMapper {
         return new User().setId(assigneeId);
     }*/
 
-    public User toEntity(Long assigneeId) {
+    /*public User toEntity(Long assigneeId) {
         return userRepository.findById(assigneeId)
                 .orElseThrow();
-    }
+    }*/
 
     public User toEntity(JsonNullable<Long> assigneeId) {
         return userRepository.findById(assigneeId.get())
@@ -112,7 +112,6 @@ public abstract class TaskMapper {
                         .orElseThrow())
                 .collect(Collectors.toSet());
     }
-
 
     public Set<Long> toDto(Set<Label> labels) {
         return labels.stream()
