@@ -3,10 +3,8 @@ package hexlet.code.service;
 import hexlet.code.dto.label.LabelCreateDTO;
 import hexlet.code.dto.label.LabelDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
-
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
-import hexlet.code.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +14,6 @@ import java.util.List;
 public class LabelService {
     @Autowired
     private LabelRepository labelRepository;
-
-     @Autowired
-     private TaskRepository taskRepository;
 
     @Autowired
     private LabelMapper labelMapper;

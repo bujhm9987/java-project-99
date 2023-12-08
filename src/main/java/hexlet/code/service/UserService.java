@@ -6,9 +6,7 @@ import hexlet.code.dto.user.UserUpdateDTO;
 
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
-import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
-import hexlet.code.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,16 +23,10 @@ public class UserService implements UserDetailsManager {
     private UserRepository userRepository;
 
     @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
     private UserMapper userMapper;
 
     @Autowired
     private PasswordEncoder encoder;
-
-    @Autowired
-    private UserUtils userUtils;
 
 
     public List<UserDTO> getAll() {

@@ -13,7 +13,6 @@ import hexlet.code.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class TaskService {
 
     public TaskDTO create(TaskCreateDTO taskData) {
 
-        var taskLabelIDs = taskData.getTaskLabelIds();
+/*        var taskLabelIDs = taskData.getTaskLabelIds();
         if (taskLabelIDs != null) {
             var labelIds = taskLabelIDs.stream()
                     .map(i -> labelRepository.findById(i)
@@ -58,11 +57,11 @@ public class TaskService {
             taskData.setTaskLabelIds(labelIds);
         } else {
             taskData.setTaskLabelIds(new HashSet<>());
-        }
+        }*/
 
         var task = taskMapper.map(taskData);
 
-        var taskStatusSlug = taskData.getStatus();
+/*        var taskStatusSlug = taskData.getStatus();
         var taskStatus = taskStatusRepository.findBySlug(taskStatusSlug)
                 .orElseThrow();
         task.setTaskStatus(taskStatus);
@@ -72,7 +71,7 @@ public class TaskService {
             var assignee = userRepository.findById(taskDataUserId)
                     .orElseThrow();
             task.setAssignee(assignee);
-        }
+        }*/
 
         taskRepository.save(task);
         return taskMapper.map(task);
@@ -90,7 +89,7 @@ public class TaskService {
 
         taskMapper.update(taskData, task);
 
-        var taskDataSlug = taskData.getStatus();
+/*        var taskDataSlug = taskData.getStatus();
         if (taskDataSlug != null) {
             var status = taskStatusRepository.findBySlug((taskDataSlug).get())
                     .orElseThrow();
@@ -111,7 +110,7 @@ public class TaskService {
                             .orElseThrow())
                     .collect(Collectors.toSet());
             task.setLabels(newLabels);
-        }
+        }*/
 
         taskRepository.save(task);
         return taskMapper.map(task);
