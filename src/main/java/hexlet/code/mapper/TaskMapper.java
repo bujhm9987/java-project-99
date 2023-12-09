@@ -54,26 +54,17 @@ public abstract class TaskMapper {
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "taskLabelIds", source = "labels")
-    /*@Mapping(target = "taskLabelIds",
-            expression = "java(getJsonNullable().of(model.getLabels().stream()"
-                    + ".map(Label::getId).collect(getCollectors().toSet())))")*/
     public abstract TaskDTO map(Task model);
 
 
     @Mapping(target = "taskStatus", source = "status")
     @Mapping(target = "assignee", source = "assigneeId")
     @Mapping(target = "labels", source = "taskLabelIds")
-    //@Mapping(target = "createdAt", ignore = true)
-    //@Mapping(target = "id", ignore = true)
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "taskLabelIds", source = "labels")
-    /*@Mapping(target = "status", source = "taskStatus.slug")
-    @Mapping(target = "assigneeId", source = "assignee.id")
-    @Mapping(target = "taskLabelIds",
-            expression = "java(model.getLabels().stream().map(i -> i.getId()).collect(getCollectors().toSet()))")*/
     public abstract TaskCreateDTO mapToCreateDTO(Task model);
 
     public TaskStatus toEntity(String slug) {
@@ -81,28 +72,11 @@ public abstract class TaskMapper {
                 .orElseThrow();
     }
 
-    /*public User toEntity(Long assigneeId) {
-        return new User().setId(assigneeId);
-    }*/
-
-    /*public User toEntity(Long assigneeId) {
-        return userRepository.findById(assigneeId)
-                .orElseThrow();
-    }*/
-
     public User toEntity(JsonNullable<Long> assigneeId) {
         return userRepository.findById(assigneeId.get())
                 .orElseThrow();
     }
 
-    /*public Set<Label> toEntity(Set<Long> labelIds) {
-        if (labelIds == null) {
-            return null;
-        }
-        return labelIds.stream()
-                .map(labelId -> new Label().setId(labelId))
-                .collect(Collectors.toSet());
-    }*/
     public Set<Label> toEntity(Set<Long> labelIds) {
         if (labelIds == null) {
             return null;
